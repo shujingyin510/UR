@@ -1,5 +1,5 @@
 ; ═══════════════════════════════════════════════════════════════
-; Sanyan Level 4 种子 VM — x86_64 ELF64 NASM 汇编 (V2)
+; Level 4 Seed VM — x86_64 ELF64 NASM Assembly (V2)
 ; 35 opcode 全实现, 寄存器保护完善
 ; r8=sp r9=pc r10=code r11=code_len r12=vars r13=stack_base r14=csp r15=cstk_base
 ; ═══════════════════════════════════════════════════════════════

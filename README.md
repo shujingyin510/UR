@@ -164,11 +164,27 @@ UR/
 ├── RESULTS.md                    ← Full result tables
 ├── ROADMAP.md                    ← Completed & planned
 ├── QUICK_START.md                ← One-command setup
-├── CHANGELOG.md                  ← UR version history
+├── CHANGELOG.md                  ← Version history
+├── LICENSE
+├── .gitignore / .gitattributes
+├── research/                     ← Tokenizer-Language experiments
+│   └── tokenizer_dsl/
+│       ├── README.md             ← Bilingual experiment report
+│       ├── token_bench.py        ← 2-model benchmark
+│       ├── multi_bench.py        ← 4-model benchmark
+│       ├── keyword_cost.py       ← 71-keyword analysis
+│       ├── experiment_abc.py     ← Scaling + cross-lang + random
+│       ├── controlled.py         ← Causality experiment
+│       ├── natural_text.py       ← Real-world text comparison
+│       └── word_decomp.py        ← Token decomposition
 ├── docs/research/
-│   ├── ternary_gating_report.md      ← Research report
+│   ├── ternary_gating_report.md      ← Research report (Chinese)
 │   └── ternary_gating_report_EN.md   ← Research report (English)
 └── csrc/
+    ├── README.md                 ← csrc documentation
+    ├── __init__.py
+    ├── tinystories_1m.bin         ← TinyStories 3.6M weights (47MB, LFS)
+    ├── tinystories_28m.bin         ← TinyStories 28M weights (231MB, LFS)
     ├── c_ops/                    ← C operator library
     │   ├── transformer_c.c       LayerNorm + GELU + Residual
     │   ├── softmax_c.c           expf Softmax
@@ -179,8 +195,8 @@ UR/
     │   ├── gpt2_scale.py         ★ 1000 prompt benchmark
     │   └── gpt2_blind.py         ★ Blind evaluation
     ├── tinystories/              ← TinyStories 3.6M/28M benchmarks
-    │   ├── ternary_infer.py      Ternary gating engine
-    │   └── ternary_scale.py      1000 prompt benchmark
+    │   ├── ternary_infer.py      Ternary gating engine v4
+    │   └── ternary_scale.py      1000 prompt benchmarks
     ├── qwen/                     ← Qwen2.5-0.5B validation
     │   ├── qwen25_bench.py       ★ UR false positive verification
     │   └── qwen_degen.py         ★ Induced degeneration

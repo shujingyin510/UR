@@ -1,15 +1,7 @@
 /* ------------------------------------------------------------
- * Sanyan Level 3 种子 VM -- 最小可审计字节码解释器
+ * Level 3 Seed VM -- minimal auditable bytecode interpreter
  *
- * 设计目标:
- *   零外部依赖(不含 #include)、纯 Linux x86_64 syscall
- *   实现 bytecode_compiler.bin 所需的全部 35 个 opcode
- *   GCC 编译 -> ~7.5KB 原生二进制 -> 人工逐字节可审计
- *
- * 编译: gcc -nostdlib -Os -fno-builtin -lgcc sanyan_vm_seed.c -o sanyan_vm -s
- * 运行: ./sanyan_vm bytecode_compiler.bin
- *
- * 编码: GBK (Windows 中文环境)
+ * 编译: gcc -nostdlib -Os -fno-builtin -lgcc vm_seed.c -o vm -s
  * ------------------------------------------------------------ */
 /* ── Linux x86_64 syscall 编号 ── */
 #define SYS_read   0

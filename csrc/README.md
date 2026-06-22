@@ -48,9 +48,9 @@ csrc/
 │   └── param_extract.py          Parameter extraction
 │
 ├── vm/                           ═══ C VM / Compiler ═══
-│   ├── sanyan_vm_seed.c          Level 3: C seed VM (318 lines, TCC-compilable)
-│   ├── sanyan_vm_l4.asm          Level 4: x86_64 NASM assembly VM (617 lines)
-│   ├── sanyan_parse.c            C parser source
+│   ├── vm_seed.c                Level 3: C seed VM (318 lines, TCC-compilable)
+│   ├── vm_l4.asm                Level 4: x86_64 NASM assembly VM (617 lines)
+│   ├── parse.c                   C parser source
 │   ├── runtime.c                 C VM core (ISA v2 interpreter, 61KB)
 │   ├── runtime_common.h          C VM common header
 │   ├── compile.c                 C compiler frontend
