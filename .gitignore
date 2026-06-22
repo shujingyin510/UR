@@ -1,0 +1,11 @@
+__pycache__/
+*.pyc
+*.dll
+*.obj
+*.o
+*.exe
+*.so
+.DS_Store
+# 允许模型权重 .bin 文件（LFS 追踪）
+!tinystories_1m.bin
+!tinystories_28m.bin
