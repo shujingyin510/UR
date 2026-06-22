@@ -1,4 +1,4 @@
-# Sanyan Ternary Gating for Inference — Complete Experimental Report
+# Ternary Gating for Inference — Complete Experimental Report
 
 > Date: 2026-06-16 ~ 06-18 | Models: TinyStories 3.6M / 28M / GPT-2 124M / Qwen2.5-0.5B
 

@@ -1,4 +1,4 @@
-# Sanyan — A Surprisingly Stable Degeneration Threshold for Small LLMs
+# UR — A Surprisingly Stable Degeneration Threshold for Small LLMs
 
 ![Models](https://img.shields.io/badge/models-GPT--2%20%7C%20Qwen2.5%20%7C%20TinyStories-blue)
 ![UR](https://img.shields.io/badge/threshold-UR%E2%89%880.30-orange)
@@ -28,11 +28,11 @@ A single **uniqueness-ratio threshold of 0.30** — the fraction of unique token
 
 Small language models frequently collapse into repetitive loops ("was was was...", "and and and...") with **confidence scores remaining at 0.97-1.00** — the model believes it's producing high-quality output while generating garbage. Standard stopping strategies (EOS token, max token limit, repetition penalty) fail to detect this.
 
-**Sanyan's UR-based stopping** catches degeneration the moment it happens:
+**UR < 0.30** catches degeneration the moment it happens:
 
 | Strategy | Avg Length | Stop Rate |
 |----------|-----------|-----------|
-| UR < 0.30 (Sanyan) | 9-64 tokens | **2-100%** (depends on model) |
+| UR < 0.30 | 9-64 tokens | **2-100%** (depends on model) |
 | EOS-only | 64 tokens | 0% |
 | Repetition Penalty | 64 tokens | 0% |
 
@@ -86,9 +86,9 @@ Human blind evaluation across 100 prompts: **ternary gating preferred 79.7% vs. 
 ## Architecture
 
 ```
-Sanyan Language (决策 DSL)
-    ↓
 Python / C VM
+    ↓
+Native FFI
     ↓
 Native FFI (reg_op)
     ↓
@@ -191,8 +191,8 @@ UR/
     ├── adaptive/                 ← Adaptive control
     │   └── adaptive_control.py   UR-based closed-loop control
     └── vm/                       ← C VM / compiler
-        ├── sanyan_vm_seed.c      C seed VM (318 lines)
-        └── sanyan_vm_l4.asm      x86_64 NASM assembly VM
+        ├── vm_seed.c             C seed VM (318 lines)
+        └── vm_l4.asm             x86_64 NASM assembly VM
 ```
 
 ---
@@ -224,4 +224,3 @@ UR/
 | [docs/research/ternary_gating_report_EN.md](docs/research/ternary_gating_report_EN.md) | Full research report (Chinese + English abstract) |
 | [csrc/README.md](csrc/README.md) | C source and inference engine docs |
 | [CHANGELOG.md](CHANGELOG.md) | Version history |
-| AGENTS.md (see main sanyan repo) | Development conventions |
