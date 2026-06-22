@@ -3,19 +3,19 @@
 ```
 csrc/
 ├── README.md                     ← This file
-├── __init__.py
+├── tinystories_1m.bin            TinyStories 3.6M weights (47MB, LFS)
+├── tinystories_28m.bin           TinyStories 28M weights (231MB, LFS)
 │
 ├── c_ops/                        ═══ C Operator Library ═══
 │   ├── transformer_c.c           LayerNorm + GELU + Residual (45 lines)
 │   ├── softmax_c.c               expf Softmax (19 lines)
-│   ├── simd_demo.asm             AVX2 FMA GEMM 256×256 assembly kernel
-│   └── simd_test.py              SIMD tests
+│   └── simd_demo.asm             AVX2 FMA GEMM 256×256 assembly kernel
 │
 ├── gpt2/                         ═══ GPT-2 124M Inference ═══
 │   ├── gpt2_engine.py            Inference engine (GPT-2 arch, C LN + KV Cache)
 │   ├── gpt2_kv.py                KV Cache fast inference (verified logit_diff=0.000046)
 │   ├── gpt2_bench.py             20 prompt quality comparison (EOS vs ternary gating)
-│   ├── gpt2_scale.py             ★ 1000 prompt full benchmark (ternary=100% stop rate)
+│   ├── gpt2_scale.py             ★ 1000 prompt full benchmark
 │   ├── gpt2_blind.py             ★ 100 prompt blind evaluation material
 │   ├── gpt2_blind_judge.py       Blind evaluation automated judging engine
 │   ├── gpt2_sizes.py             GPT-2 cross-scale validation (124M/355M/774M)
@@ -35,7 +35,7 @@ csrc/
 │   └── qwen_degen.py             ★ Induced degeneration experiment (9 bad-prompt types)
 │
 ├── ur_analysis/                  ═══ UR Analysis Tools ═══
-│   ├── ur_ablation.py            Signal ablation experiment (UR-only = full trajectory)
+│   ├── ur_ablation.py            Signal ablation experiment
 │   ├── ur_baselines.py           Human text baseline (WikiText-2 n=60)
 │   ├── ur_viz.py                 UR visualization
 │   ├── threshold_analysis.py     Threshold analysis
@@ -44,25 +44,11 @@ csrc/
 │   └── failure_analysis.py       Failure case analysis
 │
 ├── adaptive/                     ═══ Adaptive Control ═══
-│   ├── adaptive_control.py       Adaptive closed-loop control (UR dynamic penalty)
-│   └── param_extract.py          Parameter extraction
+│   └── adaptive_control.py       Adaptive closed-loop control (UR dynamic penalty)
 │
-├── vm/                           ═══ C VM / Compiler ═══
-│   ├── vm_seed.c                Level 3: C seed VM (318 lines, TCC-compilable)
-│   ├── vm_l4.asm                Level 4: x86_64 NASM assembly VM (617 lines)
-│   ├── parse.c                   C parser source
-│   ├── runtime.c                 C VM core (ISA v2 interpreter, 61KB)
-│   ├── runtime_common.h          C VM common header
-│   ├── compile.c                 C compiler frontend
-│   ├── test_runtime.c            C VM unit tests
-│   ├── harness.c                 C test harness
-│   ├── parse_harness.c           Parser tests
-│   ├── debug_parse.c             Parser debugging
-│   └── dp.c                      Dynamic programming algorithms
-│
-└── agent_tests/                  ═══ Agent Tests ═══
-    ├── agent_full_matrix.py      Full matrix test
-    └── agent_test_matrix.py      Test matrix generation
+└── vm/                           ═══ C VM ═══
+    ├── vm_seed.c                 Level 3: C seed VM (318 lines, TCC-compilable)
+    └── vm_l4.asm                 Level 4: x86_64 NASM assembly VM (617 lines)
 ```
 
 ## Key Files

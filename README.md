@@ -182,7 +182,6 @@ UR/
 │   └── ternary_gating_report_EN.md   ← Research report (English)
 └── csrc/
     ├── README.md                 ← csrc documentation
-    ├── __init__.py
     ├── tinystories_1m.bin         ← TinyStories 3.6M weights (47MB, LFS)
     ├── tinystories_28m.bin         ← TinyStories 28M weights (231MB, LFS)
     ├── c_ops/                    ← C operator library
