@@ -1,0 +1,29 @@
+
+Loading weights:   0%|          | 0/148 [00:00<?, ?it/s]
+Loading weights: 100%|��������������������| 148/148 [00:00<00:00, 5039.63it/s]
+[gpt2] ���� 0.7s
+[gpt2] merge_sort      600 tok    24.7s   24.3 tok/s  eos=False
+[gpt2] binary_search   600 tok    25.2s   23.8 tok/s  eos=False
+[gpt2] fibonacci       600 tok    26.7s   22.5 tok/s  eos=False
+[gpt2] parse_csv       600 tok    24.9s   24.1 tok/s  eos=False
+[gpt2] word_freq       600 tok    23.0s   26.1 tok/s  eos=False
+[gpt2] flatten         600 tok    25.7s   23.3 tok/s  eos=False
+[gpt2] stack_class     600 tok    23.0s   26.1 tok/s  eos=False
+[gpt2] lru_cache       600 tok    26.2s   22.9 tok/s  eos=False
+[gpt2] prime_sieve     600 tok    23.1s   26.0 tok/s  eos=False
+[gpt2] roman           600 tok    22.6s   26.6 tok/s  eos=False
+[gpt2] balanced        600 tok    23.8s   25.2 tok/s  eos=False
+[gpt2] transpose       600 tok    23.3s   25.8 tok/s  eos=False
+[gpt2] rle             600 tok    23.3s   25.7 tok/s  eos=False
+[gpt2] dedup           600 tok    22.1s   27.1 tok/s  eos=False
+[gpt2] gcd             600 tok    21.7s   27.6 tok/s  eos=False
+[gpt2] quicksort       600 tok    22.1s   27.2 tok/s  eos=False
+[gpt2] tree_walk       600 tok    22.0s   27.2 tok/s  eos=False
+[gpt2] json_walk       600 tok    22.4s   26.8 tok/s  eos=False
+[gpt2] email           600 tok    23.4s   25.6 tok/s  eos=False
+[gpt2] temp            600 tok    25.4s   23.7 tok/s  eos=False
+[gpt2] reverse_words   600 tok    24.8s   24.2 tok/s  eos=False
+[gpt2] anagram         600 tok    21.9s   27.4 tok/s  eos=False
+[gpt2] pascal          600 tok    21.8s   27.6 tok/s  eos=False
+[gpt2] chunk           600 tok    22.1s   27.2 tok/s  eos=False
+[gpt2] ��� �� D:\Test\UR\csrc\ast_ur\data\gen_gpt2.jsonl

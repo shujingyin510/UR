@@ -1,0 +1,160 @@
+===== qwen/binary_search 尾部 40 行 =====
+
+
+def binary_search_recursive_iterative(arr, target, low=0, high=None):
+    """Return index of target in sorted arr, or -1."""
+    if high is None:
+        high = len(arr) - 1
+
+    if low > high:
+        return -1
+
+    mid = (low + high) // 2
+    if arr[mid] == target:
+        return mid
+    elif arr[mid] < target:
+        return binary_search_recursive_iterative(arr, target, mid + 1, high)
+    else:
+        return binary_search_recursive_iterative(arr, target, low, mid - 1)
+
+
+def binary_search_iterative_recursive(arr, target, low=0, high=None):
+    """Return index of target in sorted arr, or -1."""
+    if high is None:
+        high = len(arr) - 1
+
+    if low > high:
+        return -1
+
+    mid = (low + high) // 2
+    if arr[mid] == target:
+        return mid
+    elif arr[mid] < target:
+        return binary_search_iterative_recursive(arr, target, mid + 1, high)
+    else:
+        return binary_search_iterative_recursive(arr, target, low, mid - 1)
+
+
+def binary_search_iterative_recursive_iterative(arr, target, low=0, high=None):
+    """Return index of target in sorted arr, or -1."""
+    if high is None:
+       
+
+===== qwen/tree_walk 尾部 40 行 =====
+    while queue:
+        node = queue.pop(0)
+        visit(node)
+        if node.left is not None:
+            queue.append(node.left)
+        if node.right is not None:
+            queue.append(node.right)
+
+
+def levelorder5(node, visit):
+    """Level-order traversal of a binary tree."""
+    if node is None:
+        return
+    queue = [node]
+    while queue:
+        node = queue.pop(0)
+        visit(node)
+        if node.left is not None:
+            queue.append(node.left)
+        if node.right is not None:
+            queue.append(node.right)
+
+
+def levelorder6(node, visit):
+    """Level-order traversal of a binary tree."""
+    if node is None:
+        return
+    queue = [node]
+    while queue:
+        node = queue.pop(0)
+        visit(node)
+        if node.left is not None:
+            queue.append(node.left)
+        if node.right is not None:
+            queue.append(node.right)
+
+
+def levelorder7(node, visit):
+    """Level-order traversal of a binary tree."""
+    if node is None
+
+===== qwen/temp 尾部 40 行 =====
+def celsius_to_fahrenheit(c):
+    """Convert Celsius to Fahrenheit."""
+    return (c * 9/5) + 32
+
+def fahrenheit_to_celsius(f):
+    """Convert Fahrenheit to Celsius."""
+    return (f - 32) * 5/9
+
+def main():
+    """Main function."""
+    celsius = float(input("Enter temperature in Celsius: "))
+    fahrenheit = celsius_to_fahrenheit(celsius)
+    print(f"{celsius}°C is {fahrenheit}°F")
+
+    fahrenheit = float(input("Enter temperature in Fahrenheit: "))
+    celsius = fahrenheit_to_celsius(fahrenheit)
+    print(f"{fahrenheit}°F is {celsius}°C")
+
+if __name__ == "__main__":
+    main()
+
+===== gpt2/fibonacci(散文/低覆盖)尾部 25 行 =====
+# The thirteenth number is the number of Fibonacci numbers in the list.
+
+#
+
+# The thirteenth number is the number of Fibonacci numbers in the list.
+
+#
+
+# The thirteenth number is the number of Fibonacci numbers in the list.
+
+#
+
+# The thirteenth number is the number of Fibonacci numbers in the list.
+
+#
+
+# The thirteenth number is the number of Fibonacci numbers in the list.
+
+#
+
+# The thirteenth number is the number of Fibonacci numbers in the list.
+
+#
+
+# The thirteenth number is the number of Fibonacci numbers in the list.
+
+===== gpt2/quicksort(散文/低覆盖)尾部 25 行 =====
+"""Sort a list using quicksort."""
+
+def sort ( self , list ):
+
+"""Sort a list using quicksort."""
+
+def sort ( self , list ):
+
+"""Sort a list using quicksort."""
+
+def sort ( self , list ):
+
+"""Sort a list using quicksort."""
+
+def sort ( self , list ):
+
+"""Sort a list using quicksort."""
+
+def sort ( self , list ):
+
+"""Sort a list using quicksort."""
+
+def sort ( self , list ):
+
+"""Sort
+

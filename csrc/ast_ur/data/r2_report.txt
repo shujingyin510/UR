@@ -1,0 +1,74 @@
+周期检出:29/48(strict 28 / quasi 1)
+R1 判「都健康」却有收尾周期的:3 条 (qwen/binary_search, qwen/tree_walk, qwen/temp)
+
+== H1 分类学:重复单元类型 × 模型(仅周期检出者)==
+[qwen] n=7  单元: {'block': 3, 'function': 4}  逐字Y/变异N: {'N': 5, 'Y': 2}
+     波长 L 中位 42 tok(范围 21-129)  D 中位 31(范围 12-54)
+[gpt2] n=22  单元: {'block': 2, 'statement': 14, 'function': 6}  逐字Y/变异N: {'Y': 22}
+     波长 L 中位 23.0 tok(范围 7-53)  D 中位 19.0(范围 6-29)
+
+== H2 token 轴定律:tok 尾部地板 ≈ D/32(仅 L≤32 的周期序列)==
+  qwen/merge_sort     L= 21 D= 16 预测地板 0.500  实测尾部 tok_min 0.531
+  qwen/lru_cache      L= 25 D= 12 预测地板 0.375  实测尾部 tok_min 0.375
+  qwen/prime_sieve    L= 23 D= 19 预测地板 0.594  实测尾部 tok_min 0.594
+  gpt2/merge_sort     L= 28 D= 14 预测地板 0.438  实测尾部 tok_min 0.438
+  gpt2/binary_search  L= 20 D= 16 预测地板 0.500  实测尾部 tok_min 0.500
+  gpt2/parse_csv      L= 27 D= 22 预测地板 0.688  实测尾部 tok_min 0.688
+  gpt2/word_freq      L= 23 D= 19 预测地板 0.594  实测尾部 tok_min 0.594
+  gpt2/flatten        L= 22 D= 18 预测地板 0.562  实测尾部 tok_min 0.562
+  gpt2/stack_class    L= 10 D=  8 预测地板 0.250  实测尾部 tok_min 0.250
+  gpt2/lru_cache      L= 14 D= 10 预测地板 0.312  实测尾部 tok_min 0.312
+  gpt2/roman          L= 23 D= 20 预测地板 0.625  实测尾部 tok_min 0.625
+  gpt2/balanced       L= 22 D= 19 预测地板 0.594  实测尾部 tok_min 0.594
+  gpt2/transpose      L= 22 D= 17 预测地板 0.531  实测尾部 tok_min 0.531
+  gpt2/rle            L= 26 D= 20 预测地板 0.625  实测尾部 tok_min 0.625
+  gpt2/dedup          L= 22 D= 18 预测地板 0.562  实测尾部 tok_min 0.562
+  gpt2/gcd            L= 26 D= 22 预测地板 0.688  实测尾部 tok_min 0.688
+  gpt2/json_walk      L= 26 D= 22 预测地板 0.688  实测尾部 tok_min 0.688
+  gpt2/email          L= 12 D=  9 预测地板 0.281  实测尾部 tok_min 0.281
+  gpt2/temp           L= 26 D= 21 预测地板 0.656  实测尾部 tok_min 0.656
+  gpt2/reverse_words  L= 16 D= 11 预测地板 0.344  实测尾部 tok_min 0.375
+  gpt2/anagram        L= 24 D= 19 预测地板 0.594  实测尾部 tok_min 0.594
+  gpt2/pascal         L= 25 D= 22 预测地板 0.688  实测尾部 tok_min 0.688
+  gpt2/chunk          L=  7 D=  6 预测地板 0.188  实测尾部 tok_min 0.188
+  n=23  Pearson r=0.998  平均绝对误差 0.003
+  L>32 的周期序列 6 条,其中 token-UR 全程未报警 5 条(预测=全部失明)
+
+== H2 报警预测混淆(周期序列上 预测 D<9.6&L<=32 vs R1 实际 tok_cross)==
+  预测Y实际Y 3  预测N实际N 25  预测Y实际N 0  预测N实际Y 1
+
+== H3 语句轴定律:ast_w 报警 ⇔ 周期去重语句数 d < w/2 ==
+  w= 4: 对 29/29(预测报警且报 14,预测不报且不报 15,错报预测 0,漏报预测 0)
+  w= 8: 对 28/29(预测报警且报 26,预测不报且不报 2,错报预测 1,漏报预测 0)
+  w=16: 对 27/29(预测报警且报 26,预测不报且不报 1,错报预测 1,漏报预测 1)
+
+== 逐序列明细(周期检出者)==
+  gpt2/tree_walk      strict p=  3 cyc= 10.7 unit=block     d= 3 L=  53 D= 28 逐字=Y R1=只AST崩
+  gpt2/prime_sieve    strict p=  3 cyc= 16.0 unit=function  d= 3 L=  39 D= 29 逐字=Y R1=只AST崩
+  gpt2/merge_sort     strict p=  2 cyc= 21.5 unit=block     d= 2 L=  28 D= 14 逐字=Y R1=只AST崩
+  gpt2/parse_csv      strict p=  1 cyc= 23.0 unit=statement d= 1 L=  27 D= 22 逐字=Y R1=只AST崩
+  gpt2/rle            strict p=  1 cyc= 24.0 unit=statement d= 1 L=  26 D= 20 逐字=Y R1=只AST崩
+  gpt2/gcd            strict p=  2 cyc= 24.0 unit=function  d= 2 L=  26 D= 22 逐字=Y R1=只AST崩
+  gpt2/json_walk      strict p=  1 cyc= 24.0 unit=statement d= 1 L=  26 D= 22 逐字=Y R1=只AST崩
+  gpt2/temp           strict p=  2 cyc= 24.0 unit=function  d= 2 L=  26 D= 21 逐字=Y R1=只AST崩
+  gpt2/pascal         strict p=  1 cyc= 25.0 unit=statement d= 1 L=  25 D= 22 逐字=Y R1=只AST崩
+  gpt2/anagram        strict p=  1 cyc= 26.0 unit=statement d= 1 L=  24 D= 19 逐字=Y R1=只AST崩
+  gpt2/word_freq      strict p=  2 cyc= 27.0 unit=function  d= 2 L=  23 D= 19 逐字=Y R1=只AST崩
+  gpt2/roman          strict p=  1 cyc= 27.0 unit=statement d= 1 L=  23 D= 20 逐字=Y R1=只AST崩
+  gpt2/flatten        strict p=  2 cyc= 28.0 unit=function  d= 2 L=  22 D= 18 逐字=Y R1=只AST崩
+  gpt2/balanced       strict p=  1 cyc= 28.0 unit=statement d= 1 L=  22 D= 19 逐字=Y R1=只AST崩
+  gpt2/transpose      strict p=  2 cyc= 28.0 unit=function  d= 2 L=  22 D= 17 逐字=Y R1=只AST崩
+  gpt2/dedup          strict p=  1 cyc= 28.0 unit=statement d= 1 L=  22 D= 18 逐字=Y R1=只AST崩
+  gpt2/binary_search  strict p=  1 cyc= 30.0 unit=statement d= 1 L=  20 D= 16 逐字=Y R1=只AST崩
+  gpt2/reverse_words  strict p=  1 cyc= 24.0 unit=statement d= 1 L=  16 D= 11 逐字=Y R1=只AST崩
+  gpt2/lru_cache      strict p=  1 cyc= 42.0 unit=statement d= 1 L=  14 D= 10 逐字=Y R1=只AST崩
+  gpt2/email          strict p=  1 cyc= 47.0 unit=statement d= 1 L=  12 D=  9 逐字=Y R1=token先崩
+  gpt2/stack_class    strict p=  1 cyc= 58.0 unit=statement d= 1 L=  10 D=  8 逐字=Y R1=token先崩
+  gpt2/chunk          strict p=  1 cyc= 82.0 unit=statement d= 1 L=   7 D=  6 逐字=Y R1=token先崩
+  qwen/binary_search  strict p= 12 cyc=  2.0 unit=function  d=12 L= 129 D= 54 逐字=N R1=都健康
+  qwen/tree_walk      strict p= 12 cyc=  6.0 unit=function  d=10 L=  77 D= 42 逐字=N R1=都健康
+  qwen/quicksort      strict p=  3 cyc=  8.0 unit=function  d= 3 L=  57 D= 35 逐字=N R1=AST先崩
+  qwen/temp           strict p=  3 cyc=  2.0 unit=block     d= 3 L=  42 D= 31 逐字=N R1=都健康
+  qwen/lru_cache      strict p=  3 cyc= 20.7 unit=block     d= 2 L=  25 D= 12 逐字=Y R1=只AST崩
+  qwen/prime_sieve    strict p=  3 cyc= 23.0 unit=function  d= 3 L=  23 D= 19 逐字=Y R1=只AST崩
+  qwen/merge_sort     quasi  p=  3 cyc= 12.0 unit=block     d= 2 L=  21 D= 16 逐字=N R1=只AST崩

@@ -1,0 +1,145 @@
+===== gpt2/t08/prime_sieve 尾部 30 行 (eos=False) =====
+
+r.update() # Get the first and last primes
+
+if len (r) > p: # Prints all the primes on the left
+
+if len (r) < p: # Prints all the primes on the right
+
+return r
+
+def primes_up_to(n):
+
+   """Return all primes <= n using the sieve of Eratosthenes."""
+
+for i in range (n):
+
+r = r.randint(100, 1 ) # Prints the number of primes
+
+r.pop() # Get the primes on the right
+
+while r < p: # Prints all the primes
+
+r.update() # Get the first and last primes
+
+if len (r) > p: # Prints all the primes on the left
+
+if len (r) < p: # Prints all the primes on the right
+
+return r
+
+def primes_up_to(
+
+===== gpt2/p95/dedup 尾部 20 行 (eos=False) =====
+
+from sqlite3.db import DB
+
+from sqlite3.db import DataTable ,
+
+from sqlite3db.db import DataTableModel
+
+from sqlite3db import DB_PATCH_DELETE_DELETE
+
+def delete_duplicates_from_models(models, models_to_do, rows):
+
+from sqlite3.config.sqlite3.dummy_utils.delete_duplicates_from_models(models):
+
+from sqlite3.db import DB
+
+from sqlite3.db import DataTable ,
+
+from sqlite3db.db import DataTableModel
+
+from sqlite3db.db import
+
+===== qwen/t08/quicksort 尾部 25 行 (eos=False) =====
+
+if __name__ == "__main__":
+    arr = [4, 3, 1, 2]
+    print("Using quicksort:")
+    quick_sort_arr = quicksort(arr)
+    print(quick_sort_arr)
+
+    print("\nUsing bubble sort:")
+    bubble_sort(arr)
+    print(arr)
+
+    print("\nUsing insertion sort:")
+    insertion_sort(arr)
+    print(arr)
+
+    print("\nUsing selection sort:")
+    selection_sort(arr)
+    print(arr)
+
+    print("\nUsing merge sort:")
+    print(merge_sort(arr))
+
+    print("\nUsing quicksort with selection:")
+    quick_sort_with_selection(arr)
+    print
+
+===== qwen/p95/tree_walk 尾部 35 行 (eos=True) =====
+        return None
+    root = TreeNode(nums[0])
+    queue = deque([root])
+    idx = 0
+    while queue:
+        node = queue.popleft()
+        if node:
+            mid = (idx + 1) // 2
+            node.left = TreeNode(nums[mid])
+            queue.append(node.left)
+            if node.left:
+                queue.append(node.left)
+            mid = (idx + 1) // 2
+            node.right = TreeNode(nums[idx])
+            queue.append(node.right)
+            if node.right:
+                queue.append(node.right)
+            idx += 1
+    return root
+
+
+class Solution:
+    def inOrder(self, root: TreeNode) -> List[int]:
+        return inorder(root, list())
+
+    def postOrder(self, root: TreeNode) -> List[int]:
+        return postorder(root, list())
+
+    def preorder(self, root: TreeNode) -> List[int]:
+        return preorder(root, list())
+
+
+if __name__ == '__main__':
+    root = buildTree([1, 2, 3, None, None, None, 5])
+    print(Solution().inOrder(root))
+
+===== qwen/p95/merge_sort 尾部 25 行 (eos=True) =====
+    right_index = 0
+
+    while left_index < len(left_half) and right_index < len(right_half):
+        if left_half[left_index] < right_half[right_index]:
+            merged.append(left_half[left_index])
+            left_index += 1
+        else:
+            merged.append(right_half[right_index])
+            right_index += 1
+
+    while left_index < len(left_half):
+        merged.append(left_half[left_index])
+        left_index += 1
+
+    while right_index < len(right_half):
+        merged.append(right_half[right_index])
+        right_index += 1
+
+    return merged
+
+# Example usage:
+if __name__ == "__main__":
+    unsorted_list = [38, 27, 43, 3, 9, 82, 10]
+    sorted_list = merge_sort(unsorted_list)
+    print("Sorted list:", sorted_list)
+

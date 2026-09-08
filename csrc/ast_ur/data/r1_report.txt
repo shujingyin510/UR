@@ -1,0 +1,53 @@
+
+===== qwen(n=24) =====
+解析覆盖率 中位 1.00(<0.4 噪声 0 条)
+裁决(w8/abs0.5 vs tok0.3): {'只AST崩': 3, '都健康': 20, 'AST先崩': 1}
+双崩 1 条:AST 领先中位 330 token(正=AST早)  范围 330~330
+「结构已崩、词法仍健康」:AST 崩点处 tokUR≥0.3 的 4/4 条;只 AST 崩 3 条
+  w= 4: AST 绝对崩 1 条  相对崩 1 条
+  w= 8: AST 绝对崩 4 条  相对崩 3 条
+  w=16: AST 绝对崩 5 条  相对崩 3 条
+
+样例 merge_sort(AST崩@tok130 tokUR彼时0.719 tok崩@None):
+                arr[k] = left[i]
+                i += 1
+            else:
+                arr[k] = right[j]
+                j += 1
+            k += 1
+
+        while i < len(left):
+            arr[k] = left[i]
+            i += 1
+
+===== gpt2(n=24) =====
+解析覆盖率 中位 0.60(<0.4 噪声 1 条)
+裁决(w8/abs0.5 vs tok0.3): {'只AST崩': 19, '都健康': 2, 'token先崩': 3}
+双崩 3 条:AST 领先中位 -13 token(正=AST早)  范围 -30~-4
+「结构已崩、词法仍健康」:AST 崩点处 tokUR≥0.3 的 19/22 条;只 AST 崩 19 条
+  w= 4: AST 绝对崩 14 条  相对崩 3 条
+  w= 8: AST 绝对崩 22 条  相对崩 3 条
+  w=16: AST 绝对崩 22 条  相对崩 3 条
+
+样例 merge_sort(AST崩@tok94 tokUR彼时0.438 tok崩@None):
+    """Sort a list using merge sort."""
+
+sort_sort(arr, len(arr))
+
+return sorted(arr)
+
+def merge_sort(arr):
+
+sort_sort(arr, len(arr))
+
+return sorted(arr)
+
+def merge_sort(arr):
+
+sort_sort(arr, len(arr))
+
+return sorted(arr)
+
+def merge_sort(arr):
+
+sort_sort(arr, len(arr))

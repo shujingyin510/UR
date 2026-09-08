@@ -1,0 +1,27 @@
+Loading weights:   0%|          | 0/148 [00:00<?, ?it/s]Loading weights: 100%|██████████| 148/148 [00:00<00:00, 5464.79it/s]
+[gpt2/t08] 加载 0.7s  {'temperature': 0.8, 'top_p': 1.0}
+[gpt2/t08] merge_sort      600 tok    26.6s   22.5 tok/s  eos=False
+[gpt2/t08] binary_search   600 tok    25.3s   23.7 tok/s  eos=False
+[gpt2/t08] fibonacci       600 tok    26.7s   22.5 tok/s  eos=False
+[gpt2/t08] parse_csv       600 tok    30.3s   19.8 tok/s  eos=False
+[gpt2/t08] word_freq       600 tok    28.4s   21.1 tok/s  eos=False
+[gpt2/t08] flatten         600 tok    30.9s   19.4 tok/s  eos=False
+[gpt2/t08] stack_class     600 tok    29.8s   20.1 tok/s  eos=False
+[gpt2/t08] lru_cache       600 tok    30.4s   19.7 tok/s  eos=False
+[gpt2/t08] prime_sieve     600 tok    32.5s   18.4 tok/s  eos=False
+[gpt2/t08] roman           600 tok    29.3s   20.5 tok/s  eos=False
+[gpt2/t08] balanced        600 tok    28.8s   20.9 tok/s  eos=False
+[gpt2/t08] transpose       600 tok    26.8s   22.4 tok/s  eos=False
+[gpt2/t08] rle             600 tok    23.0s   26.1 tok/s  eos=False
+[gpt2/t08] dedup           600 tok    26.1s   23.0 tok/s  eos=False
+[gpt2/t08] gcd             600 tok    26.4s   22.7 tok/s  eos=False
+[gpt2/t08] quicksort       600 tok    21.3s   28.2 tok/s  eos=False
+[gpt2/t08] tree_walk       600 tok    21.3s   28.2 tok/s  eos=False
+[gpt2/t08] json_walk       600 tok    21.3s   28.2 tok/s  eos=False
+[gpt2/t08] email           600 tok    21.3s   28.2 tok/s  eos=False
+[gpt2/t08] temp            600 tok    21.3s   28.2 tok/s  eos=False
+[gpt2/t08] reverse_words   600 tok    21.6s   27.8 tok/s  eos=False
+[gpt2/t08] anagram         600 tok    24.4s   24.6 tok/s  eos=False
+[gpt2/t08] pascal          600 tok    21.4s   28.1 tok/s  eos=False
+[gpt2/t08] chunk           600 tok    21.4s   28.1 tok/s  eos=False
+[gpt2/t08] 完成 → D:\Test\UR\csrc\ast_ur\data\gen_gpt2_t08.jsonl

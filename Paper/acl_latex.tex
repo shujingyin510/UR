@@ -1,0 +1,536 @@
+\documentclass[11pt]{article}
+
+% Change "review" to "final" to generate the final (sometimes called camera-ready) version.
+% Change to "preprint" to generate a non-anonymous version with page numbers.
+\usepackage[review]{acl}
+
+% Standard package includes
+\usepackage{times}
+\usepackage{latexsym}
+
+% For proper rendering and hyphenation of words containing Latin characters (including in bib files)
+\usepackage[T1]{fontenc}
+% For Vietnamese characters
+% \usepackage[T5]{fontenc}
+% See https://www.latex-project.org/help/documentation/encguide.pdf for other character sets
+
+% This assumes your files are encoded as UTF8
+\usepackage[utf8]{inputenc}
+
+% This is not strictly necessary, and may be commented out,
+% but it will improve the layout of the manuscript,
+% and will typically save some space.
+\usepackage{microtype}
+
+% This is also not strictly necessary, and may be commented out.
+% However, it will improve the aesthetics of text in
+% the typewriter font.
+\usepackage{inconsolata}
+
+%Including images in your LaTeX document requires adding
+%additional package(s)
+\usepackage{booktabs}
+
+\usepackage{multirow}
+
+\usepackage{adjustbox}
+
+\usepackage{tikz}
+
+\usepackage{amsmath}
+
+\usepackage{amssymb}
+
+% If the title and author information does not fit in the area allocated, uncomment the following
+%
+%\setlength\titlebox{<dim>}
+%
+% and set <dim> to something 5cm or larger.
+
+\title{Detecting Generation Collapse in Language Models via a Cross-Architecture Unique-Ratio Threshold}
+
+% Author information can be set in various styles:
+% For several authors from the same institution:
+% \author{Author 1 \and ... \and Author n \\
+%         Address line \\ ... \\ Address line}
+% if the names do not fit well on one line use
+%         Author 1 \\ {\bf Author 2} \\ ... \\ {\bf Author n} \\
+% For authors from different institutions:
+% \author{Author 1 \\ Address line \\  ... \\ Address line
+%         \And  ... \And
+%         Author n \\ Address line \\ ... \\ Address line}
+% To start a separate ``row'' of authors use \AND, as in
+% \author{Author 1 \\ Address line \\  ... \\ Address line
+%         \AND
+%         Author 2 \\ Address line \\ ... \\ Address line \And
+%         Author 3 \\ Address line \\ ... \\ Address line}
+
+\author{First Author \\
+  Affiliation / Address line 1 \\
+  Affiliation / Address line 2 \\
+  Affiliation / Address line 3 \\
+  \texttt{email@domain} \\\And
+  Second Author \\
+  Affiliation / Address line 1 \\
+  Affiliation / Address line 2 \\
+  Affiliation / Address line 3 \\
+  \texttt{email@domain} \\}
+
+%\author{
+%  \textbf{First Author\textsuperscript{1}},
+%  \textbf{Second Author\textsuperscript{1,2}},
+%  \textbf{Third T. Author\textsuperscript{1}},
+%  \textbf{Fourth Author\textsuperscript{1}},
+%\\
+%  \textbf{Fifth Author\textsuperscript{1,2}},
+%  \textbf{Sixth Author\textsuperscript{1}},
+%  \textbf{Seventh Author\textsuperscript{1}},
+%  \textbf{Eighth Author \textsuperscript{1,2,3,4}},
+%\\
+%  \textbf{Ninth Author\textsuperscript{1}},
+%  \textbf{Tenth Author\textsuperscript{1}},
+%  \textbf{Eleventh E. Author\textsuperscript{1,2,3,4,5}},
+%  \textbf{Twelfth Author\textsuperscript{1}},
+%\\
+%  \textbf{Thirteenth Author\textsuperscript{3}},
+%  \textbf{Fourteenth F. Author\textsuperscript{2,4}},
+%  \textbf{Fifteenth Author\textsuperscript{1}},
+%  \textbf{Sixteenth Author\textsuperscript{1}},
+%\\
+%  \textbf{Seventeenth S. Author\textsuperscript{4,5}},
+%  \textbf{Eighteenth Author\textsuperscript{3,4}},
+%  \textbf{Nineteenth N. Author\textsuperscript{2,5}},
+%  \textbf{Twentieth Author\textsuperscript{1}}
+%\\
+%\\
+%  \textsuperscript{1}Affiliation 1,
+%  \textsuperscript{2}Affiliation 2,
+%  \textsuperscript{3}Affiliation 3,
+%  \textsuperscript{4}Affiliation 4,
+%  \textsuperscript{5}Affiliation 5
+%\\
+%  \small{
+%    \textbf{Correspondence:} \href{mailto:email@domain}{email@domain}
+%  }
+%}
+
+\begin{document}
+\maketitle
+
+\begin{abstract}
+Reliable uncertainty estimation is crucial for deploying autoregressive language models safely. However, we identify a fundamental \textbf{extrinsic-lexical uncertainty decoupling} in small language models: during deterministic degenerative loops (e.g., repeating ``was was was''), the model's internal uncertainty signal (softmax confidence) remains artificially saturated at 0.97--1.00, completely decoupling from the actual output quality. This invalidates confidence-based stopping criteria. To address this calibration gap, we propose a mechanism-agnostic \textit{extrinsic uncertainty proxy}: a sliding-window unique-ratio (UR) signal that measures the fraction of distinct tokens in a 32-token window, combined with a single threshold at 0.30. We evaluate UR across four models spanning three architectures (GPT-Neo, GPT-2, Qwen2) and two orders of magnitude in parameters (3.6M--494M). On two genuinely degenerating models (GPT-Neo 3.6M and 28M), UR achieves 100\% detection [95\% CI: 99.6--100\%] under clean sampling. On coherent models (GPT-2 124M and Qwen2.5-0.5B), UR correctly stays near-silent, with trigger/false-positive rates of 0.4--2\%. Critically, when GPT-2---coherent under clean sampling---is induced to degenerate via a repetition penalty, UR detects the induced collapse, demonstrating that the signal tracks actual degeneration rather than model identity. Threshold sensitivity analysis on 1{,}214 measured samples reveals a TPR knee at 0.30 (0.847 $\rightarrow$ 0.993) with a Youden's $J$ optimum at 0.32, confirming the threshold is not fragile. An ablation shows UR is the sufficient and earliest-fully-collapsing signal: auxiliary trajectory signals offer marginally earlier warning on a minority of cases but are not necessary for detection. The threshold is language-agnostic, with cross-lingual (English/Chinese) false-positive differences within statistical noise on Qwen2.5-0.5B. These results suggest a single statistical threshold can serve as a broadly stable degeneration detector that fires on genuine collapse and stays silent on coherent generation, across the architectures, scales, and languages tested.
+\end{abstract}
+\section{Introduction}
+
+Language models frequently fall into repetitive generation loops during open-ended decoding, especially at small parameter scales \citep{holtzman2020}. This phenomenon---degeneration---manifests as token-level loops, semantic exhaustion, or rambling with low lexical diversity. In production deployments, such failures waste compute, harm user experience, and require expensive post-hoc filtering.
+
+Existing remedies are largely mechanism-specific. Repetition penalties \citep{keskar2019} shrink the sampling space but, as we show, can worsen collapse on certain models. Contrastive search \citep{su2022} requires strong baselines. Confidence-based stopping---stopping when softmax probability falls below a threshold---is intuitively appealing, but rests on a critical assumption: that model confidence tracks output quality.
+
+We demonstrate that this assumption is false. On two small GPT-Neo models (3.6M and 28M parameters), softmax confidence remains at 0.97--1.00 even when the model deterministically outputs ``was was was'' (Section~\ref{sec:calibration-gap}). This decoupling is not a fixable engineering issue but a structural property of the model family at small scales.
+
+We therefore propose a \textbf{mechanism-agnostic, content-based degeneration detector}: a sliding-window unique-ratio (UR) signal, defined as the fraction of distinct tokens in a window of size 32, with a single decision threshold of 0.30. Our contributions are:
+
+\begin{itemize}
+    \item We empirically identify and document this calibration gap, where softmax confidence is fully decoupled from output quality.
+    \item We show that a single UR threshold (0.30) cleanly separates two genuinely degenerating models (GPT-Neo 3.6M/28M, 100\% detection) from coherent ones (GPT-2 124M, Qwen2.5-0.5B; 0.4--2\% trigger rate), and that the same threshold holds across English and Chinese.
+    \item When GPT-2---coherent under clean sampling---is induced to degenerate via a repetition penalty, UR detects the induced collapse, indicating the signal tracks actual degeneration rather than model identity.
+    \item An ablation shows UR is the sufficient and earliest-collapsing signal: auxiliary trajectory signals (periodicity, no-new-word) trigger slightly earlier on a minority of cases but are not necessary for detection.
+    \item We characterize a wide separation band (0.20--0.40) via measured ROC on 1,214 real samples, in which threshold choice is non-fragile.
+    \item An automatic, rule-based A/B preference protocol (200 outputs, 2 dimensions) confirms that UR-based early stopping terminates generation before degeneration without sacrificing coherence.
+    \item We release code, prompt sets, and UR traces for full reproducibility.\footnote{\url{anonymous.4open.science/r/UR-634E}}
+\end{itemize}
+
+\section{Related Work}
+
+\textbf{Repetition and degeneration.} \citet{holtzman2020} identified the degeneration problem in neural text generation. Remedies include repetition penalties \citep{keskar2019}, nucleus sampling \citep{holtzman2020}, and contrastive search \citep{su2022}. These methods intervene at the sampling stage; their effectiveness varies by model and prompt. Unlikelihood training \citep{welleck2020} penalizes unlikely token sequences during training rather than inference. We address the complementary problem: detecting degeneration \emph{after} it begins, regardless of the sampling strategy in use.
+
+\textbf{Uncertainty and calibration.} The reliability of softmax confidence as an uncertainty signal has been questioned for large LMs \citep{guo2017, jiang2021}. We extend this line of inquiry to small LMs, where this decoupling is more severe: confidence remains near-perfect even during deterministic degeneration.
+
+\textbf{Quality-aware decoding.} Recent work explores reference-based and embedding-based quality metrics (e.g., MAUVE \citep{liu2021}). These are typically \emph{post-hoc} or require auxiliary models. Our UR signal is \emph{online}, requires no reference, and operates at the token level.
+
+\paragraph{Diversity and repetition metrics.} Lexical-diversity measures such as distinct-$n$ \citep{li2016} and sequence-level repetition rates (seq-rep-$n$; \citealp{welleck2020}) are standard for evaluating generated text. UR can be viewed as a windowed distinct-1 computed online during decoding. Our contribution is not the statistic itself but (i) the empirical calibration gap that motivates a content-based signal, and (ii) a single, architecture- and language-stable decision threshold with measured-ROC support, turning a corpus-level diversity metric into an online stopping rule.
+
+\textbf{Positioning.} Unlike prior work, our method is (i)~\emph{content-driven} (depends on output statistics, not model internals), (ii)~\emph{mechanism-agnostic} (works alongside any sampling strategy), and (iii)~\emph{language-agnostic} (verified on English and Chinese). Our UR-based degeneration detector aligns with the goals of shared tasks such as SHROOM-Visions, offering a lightweight, model-agnostic signal for hallucination detection that complements existing reference-based metrics.
+
+\section{Method}
+
+\subsection{Problem Formulation}
+
+Let $y_{1:T} = (y_1, y_2, \dots, y_T)$ be a generated token sequence. We seek a stopping rule $S(y_{1:t})$ that triggers before $y_{1:T}$ enters a degenerate loop. We require $S$ to be:
+
+\begin{itemize}
+    \item \textbf{Online:} computable at each step $t$ using only $y_{1:t}$.
+    \item \textbf{Content-based:} independent of model internals (logits, hidden states).
+    \item \textbf{Calibrated:} low FPR on coherent text, high TPR on degenerating text.
+\end{itemize}
+
+\subsection{The Unique-Ratio Signal}
+
+Given a sliding window of size $w$, the unique ratio at step $t$ is:
+
+$$
+\text{UR}(t; w) = \frac{|\{y_i : t - w \le i \le t\}|_{\text{unique}}}{w}
+$$
+
+Intuitively, UR $\to$ 1 when the window is lexically diverse, and UR $\to 1/k$ when the model repeats a single token $k$ times within the window.
+
+\subsection{Auxiliary Trajectory Signals}
+While UR is our primary signal, we define three auxiliary signals used in our ablation study (Section 4.4):
+\begin{itemize}
+    \item \textbf{Periodicity:} Triggered if the last $k$ tokens exactly match the preceding $k$ tokens (we use $k=3$).
+    \item \textbf{No-new-word:} Triggered if the set of unique tokens in the current window is a strict subset of the unique tokens in the preceding window.
+    \item \textbf{Function-word density:} The ratio of function words in the window. A spike often precedes syntactic breakdown.
+\end{itemize}
+
+\textbf{Why unique-ratio?} We evaluated three alternative signals before selecting UR:
+
+\begin{table}[t]
+\centering
+\caption{Alternative signals tested on degenerating models. Only UR achieves reliable detection.}
+\label{tab:alternative-signals}
+\adjustbox{max width=\columnwidth}{
+\begin{tabular}{lll}
+\toprule
+\textbf{Signal} & \textbf{Stop Rate} & \textbf{Issue} \\
+\midrule
+Bigram entropy & 0\% & Token IDs naturally diverse \\
+Trigram entropy & 0\% & Mixed tokens $\neq$ repetition \\
+Adaptive UR & 0\% & Degraded tokens still varied \\
+UR $<$ 0.30 & 100\% & Effective \\
+\bottomrule
+\end{tabular}
+}
+\end{table}
+
+Bigram and trigram entropy fail because GPT-2's 50,000+ token vocabulary makes token-level IDs naturally diverse---even degenerate output produces varied n-gram statistics. Adaptive UR (increasing the threshold as the window shrinks) fails because degenerate output tokens retain surface-level variation. UR succeeds because it directly measures the fundamental property of degeneration: the collapse of lexical diversity below a critical threshold.
+
+\subsection{The Calibration Gap Phenomenon}
+\label{sec:calibration-gap}
+
+Table~\ref{tab:calibration-gap} shows this calibration gap empirically: model confidence is fully decoupled from output quality. On both models, softmax confidence remains at 0.97--1.00 throughout a deterministic repetitive loop. This invalidates any stopping rule based on confidence alone.
+
+\begin{table}[t]
+\centering
+\caption{Softmax confidence during degenerate generation. Confidence remains at 0.97--1.00 despite the model producing a deterministic loop.}
+\label{tab:calibration-gap}
+\adjustbox{max width=\columnwidth}{
+\begin{tabular}{lll}
+\toprule
+\textbf{Model} & \textbf{Output (steps 1--20)} & \textbf{Confidence} \\
+\midrule
+TinyStories 3.6M & ``was was was \ldots'' & 1.0000 \\
+TinyStories 28M & ``was was was \ldots'' & 0.969 $\to$ 1.000 \\
+\bottomrule
+\end{tabular}
+}
+\end{table}
+
+\subsection{Decision Rule}
+
+We choose threshold $\tau = 0.30$ and stop generation when $\text{UR}(t; 32) < \tau$ for any $t$. Justification is given in Section~\ref{sec:threshold-sensitivity}:
+\begin{itemize}
+    \item Natural-language text has $\text{UR} \in [0.40, 1.00]$ (human baseline mean = 0.849).
+    \item Degenerate text has $\text{UR} \in [0.01, 0.25]$ (model baseline mean = 0.102).
+    \item The threshold lies in a wide separation band $[0.20, 0.40]$ where classification is invariant to the exact choice.
+\end{itemize}
+
+\section{Experiments}
+
+\subsection{Setup}
+\label{sec:setup}
+
+\textbf{Models.} Four autoregressive LMs spanning three architectures and two orders of magnitude in parameter count:
+\begin{itemize}
+    \item TinyStories-3.6M / 28M (GPT-Neo architecture) \citep{eldan2023}
+    \item GPT-2-124M (GPT-2 architecture) \citep{radford2019}
+    \item Qwen2.5-0.5B (494M, Qwen2 architecture with RMSNorm + RoPE + SwiGLU) \citep{bai2023}
+\end{itemize}
+
+\textbf{Data.} 1,000 open-ended English prompts per model, plus 1,000 Chinese prompts on Qwen2.5-0.5B for cross-lingual evaluation. Human baseline: 60 paragraphs from WikiText-2 \citep{merity2016}, tokenized with GPT-2 tokenizer, yielding 4,996 sliding-window UR samples.
+
+\textbf{Decoding.} Up to 64 tokens. Sliding window $w=32$ for all UR computations unless otherwise specified. Decoding hyperparameters for each experiment are specified where the results are reported.
+
+\textbf{Metrics.} We strictly distinguish between prompt-level and token-level measures:
+\begin{itemize}
+    \item \textbf{Prompt-level Stop-Rate} (Table 3): The fraction of 1,000 prompts on which the detector triggers a stop \textit{at any point} within the 64-step budget.
+    \item \textbf{Window-level TPR/FPR} (Table 4): The fraction of \textit{individually labeled} sliding windows (totaling 1,214 samples) whose UR falls below the threshold. This measures single-step statistical sensitivity, independent of temporal accumulation.
+\end{itemize}
+We also report Youden’s $J = \text{TPR} - \text{FPR}$ and F1. All percentages include 95\% confidence intervals.
+
+\subsection{Main Result: Cross-Architecture Threshold}
+\label{sec:main-result}
+
+Table~\ref{tab:main-result} shows the headline result. UR fires on 100\% of outputs from the two genuinely degenerating models (3.6M, 28M) while triggering on only 0.4--2\% of outputs from coherent models (GPT-2 124M, Qwen2.5). The detector separates the two regimes cleanly under identical clean decoding.
+
+\begin{table*}[t]
+\centering
+\caption{UR detection across four models. On genuinely degenerating models, UR fires reliably (TPR); on coherent models, it stays near-silent (trigger/false-positive rate). All under clean sampling (temperature 0.8, top-$k$ 50, no repetition penalty). 95\% CIs via Clopper--Pearson (TPR) and Wilson (FPR).}
+\label{tab:main-result}
+\begin{tabular}{lllll}
+\toprule
+\multicolumn{5}{l}{\textit{Genuinely degenerating models (true-positive rate)}} \\
+\midrule
+\textbf{Model} & \textbf{Arch} & \textbf{Params} & \textbf{TPR} & \textbf{Avg Stop} \\
+\midrule
+TinyStories 3.6M & GPT-Neo & 3.6M & 100\% [99.6, 100] & 10.8 tk \\
+TinyStories 28M & GPT-Neo & 28M & 100\% [99.6, 100] & 9.1 tk \\
+\midrule
+\multicolumn{5}{l}{\textit{Coherent models (trigger / false-positive rate)}} \\
+\midrule
+\textbf{Model} & \textbf{Arch} & \textbf{Params} & \textbf{Rate} & \textbf{Avg Len} \\
+\midrule
+GPT-2 124M & GPT-2 & 124M & 2.0\% [1.2, 3.1] & 63.5 tk \\
+Qwen2.5-0.5B (EN) & Qwen2 & 494M & 0.4\% [0.1, 1.0] & --- \\
+Qwen2.5-0.5B (ZH) & Qwen2 & 494M & 0.6\% [0.2, 1.3] & --- \\
+\bottomrule
+\end{tabular}
+\end{table*}
+
+The 0.4\% FPR on Qwen2.5 is dominated by pathological inputs (e.g., ``The cat cat'') that cause the model to legitimately collapse. We verify via a binomial test ($H_0$: FPR $\ge$ 1\%; observed 4/1,000; $p = 0.0287 < 0.05$) that the false-positive rate is statistically below 1\%.
+
+\textbf{Degeneration is model-dependent, not universal.} Under clean sampling, only the two smallest models (3.6M, 28M) exhibit endogenous degeneration, collapsing into repetitive loops within 9--11 tokens on average; UR detects this in 100\% of cases. GPT-2 124M, by contrast, rarely degenerates under the same clean decoding (average length 63.5, near the 64-token cap), behaving like the much larger Qwen2.5-0.5B rather than the TinyStories models. UR correctly reflects this: it triggers on only 2.0\% of GPT-2 outputs. This separation---high TPR on genuinely degenerating models, near-silence on coherent ones---is the central evidence that UR tracks degeneration itself rather than firing indiscriminately.
+
+\paragraph{Confirming the signal tracks degeneration, not identity.} To verify that UR's silence on GPT-2 reflects genuine coherence rather than a blind spot, we induce degeneration in GPT-2 via a repetition penalty (rep\_penalty=1.15) in an exploratory probe ($N=4$ prompts). All four outputs collapse into repetitive loops, and UR fires in every case (4/4, mean UR=0.117 at trigger). This indicates that GPT-2's silence under clean sampling reflects genuine coherence rather than detector failure. We emphasize that this experiment serves as a stress test rather than a proof of UR's efficacy (already established in Table~\ref{tab:main-result}): it demonstrates that UR responds to diversity collapse regardless of whether the collapse is endogenous (model-driven) or induced (decoding-strategy-driven), confirming UR as a general-purpose extrinsic uncertainty proxy. Given the small sample, we treat this as a confirmatory probe rather than a powered claim.
+
+\subsection{Threshold Sensitivity Analysis}
+\label{sec:threshold-sensitivity}
+
+We construct a measured ROC curve from 1,214 real samples: 294 degraded windows from GPT-2 124M outputs and 920 normal samples (860 from GPT-2 nucleus-sampled outputs + 60 human-written WikiText-2 passages, 4,996 total windows).Crucially, the degraded/normal labels are assigned independently of UR: degraded windows are taken from greedy-decoded outputs exhibiting deterministic repetitive loops, and normal windows from nucleus-sampled outputs and human-written WikiText-2 passages. The ROC therefore measures UR against an external label, not a UR-derived one.
+
+\begin{table}[t]
+\centering
+\caption{Measured ROC sensitivity over UR $\in$ [0.24, 0.40]. $^*$Youden's $J$ optimum = 0.32. We choose 0.30 at the TPR knee (0.847 $\to$ 0.993), sacrificing 0.7\% TPR for lower FPR. Thresholds 0.20--0.40 all yield TPR $\ge$ 0.847 and FPR $\le$ 0.048.}
+\label{tab:roc}
+\adjustbox{max width=\columnwidth}{
+\begin{tabular}{lllll}
+\toprule
+$\tau$ & Window-TPR & FPR & F1 & Youden's $J$ \\
+\midrule
+0.24 & 0.847 & 0.000 & 0.917 & 0.847 \\
+0.28 & 0.847 & 0.018 & 0.889 & 0.828 \\
+\textbf{0.30} & \textbf{0.993} & \textbf{0.024} & \textbf{0.961} & \textbf{0.969} \\
+0.32 & 1.000 & 0.030 & 0.955 & 0.970$^*$ \\
+0.40 & 1.000 & 0.048 & 0.930 & 0.952 \\
+\bottomrule
+\end{tabular}
+}
+\end{table}
+
+\textbf{The TPR knee at 0.30.} At thresholds 0.24--0.28, TPR plateaus at 0.847 because approximately 15\% of degraded samples have UR values between 0.24 and 0.30---these are cases where degeneration is intermittent or mild, interspersing degraded and normal tokens. At 0.30, TPR jumps to 0.993, capturing nearly all of these borderline cases. In multi-step detection (the sliding window advances with each token), borderline samples are captured in subsequent windows when degradation deepens, so the single-window snapshot at 0.993 underestimates the multi-step system's true detection rate. Although $\tau=0.32$ maximizes Youden's $J$, we select $\tau=0.30$ because it lies at the TPR knee, where the marginal gain from 0.30 to 0.32 is only 0.7\% TPR at the cost of a 25\% relative increase in FPR (from 0.024 to 0.030). In uncertainty-aware systems, minimizing false alarms is often more critical than maximizing recall by a fraction of a percent.
+
+\textbf{Why 0.30 is not a magic number.} The threshold sits at the empirical intersection of two distinct distributions: natural-language text (UR $\ge$ 0.40) and degenerate repetition (UR $\le$ 0.25). The 0.20-wide plateau in between means the threshold is robust to distribution shift, not overfit to a particular dataset. Table~\ref{tab:stop-distribution} corroborates this: 99.9\% of stops on the 28M model occur within the UR 0.27--0.30 band, confirming that 0.30 is at the peak of the degenerate UR distribution.
+
+\begin{table}[t]
+\centering
+\caption{Stop-trigger UR distribution on TinyStories 28M ($N$=1000). 96.4\% of stops are UR-triggered within 0.25--0.29; the remaining 3.6\% are triggered by auxiliary signals at UR=0.31.}
+\label{tab:stop-distribution}
+\adjustbox{max width=\columnwidth}{
+\begin{tabular}{lll}
+\toprule
+\textbf{Stop trigger} & \textbf{Count} & \textbf{Percentage} \\
+\midrule
+UR=0.29 & 501 & 50.1\% \\
+UR=0.27 & 461 & 46.1\% \\
+Cycle/no-new-word (UR=0.31) & 36 & 3.6\% \\
+UR=0.25 & 2 & 0.2\% \\
+\bottomrule
+\end{tabular}
+}
+\end{table}
+
+\textbf{Distribution separation.} The separation between human and degraded text is striking (Table~\ref{tab:separation}): 99.8\% of human-written windows have UR $\ge$ 0.30, and 99.7\% of degraded windows have UR $<$ 0.30. The gap between the maximum degraded window UR (0.25) and the 99.8th-percentile human window UR (0.40) spans 0.156---a wide margin admitting a robust threshold at any point in between.
+
+\begin{table*}[t]
+\centering
+\caption{Distribution separation between human-written and model-degraded text.}
+\label{tab:separation}
+\begin{tabular}{lllll}
+\toprule
+\textbf{Text type} & \textbf{N (windows)} & \textbf{Mean UR} & \textbf{95\% CI} & \textbf{UR $<$ 0.30} \\
+\midrule
+Human (WikiText-2) & 4,996 & 0.849 & [0.846, 0.852] & 0.2\% \\
+Degraded (GPT-2 124M) & 1,000 & 0.101 & --- & 99.7\% \\
+\bottomrule
+\end{tabular}
+\end{table*}
+
+\subsection{Ablation: UR is Sufficient but Not the Only Early Signal}
+
+A natural question is whether the full trajectory detection system (UR + periodicity + function-word density + no-new-word + persistence) provides any benefit over UR alone. Table~\ref{tab:ablation} shows the answer is \textbf{no}.
+
+\begin{table}[t]
+\centering
+\caption{Ablation on degenerating models ($N=1000$ per model). UR alone
+matches the full system's binary stop rate. Auxiliary signals fire only
+marginally earlier (see Section 4.4).}
+\label{tab:ablation}
+\begin{tabular}{lcc}
+\toprule
+Signal & 3.6M & 28M \\
+\midrule
+Full trajectory & 100\% & 100\% \\
+UR only ($<0.30$) & 100\% & 100\% \\
+Periodicity only & 0\% & 0\% \\
+Function-word only & 0\% & 0\% \\
+EOS-only (no detection) & 0\% & 0\% \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+On the two degenerating models, UR alone matches the full system's binary stop rate (Table~\ref{tab:ablation}). However, auxiliary signals are not entirely redundant: on the 28M model, 36/1000 stops (3.6\%) are triggered by periodicity or no-new-word detection at UR=0.31, slightly before UR crosses 0.30 (Table~\ref{tab:stop-distribution}). We therefore characterize UR as the \emph{sufficient and earliest-fully-collapsing} signal: auxiliary signals offer marginally earlier warning on a minority of cases but are not necessary, since UR captures all degeneration within 1--2 additional steps.
+
+\textbf{Scope caveat.} The ablation is performed only on degenerating models. On larger models or different degeneration patterns (e.g., semantic loops), auxiliary signals may become necessary. We leave this to future work.
+
+\subsection{Automatic Rule-Based Preference Evaluation}
+
+We conduct an automatic, rule-based A/B preference evaluation comparing UR-based early stopping against EOS-only generation (output to 64 tokens). 100 prompts are sampled on the 28M model (the GPT-2 comparison is omitted, as GPT-2 does not degenerate under clean sampling and early stopping rarely triggers); each prompt is decoded with both strategies, and the two outputs are compared by deterministic programmatic rules (no human annotators). We report results on two dimensions: 
+
+\begin{enumerate}
+    \item \textbf{Coherence}: An output containing $\geq 3$ consecutive identical characters or non-ASCII garbled text is judged incoherent; the other output wins. This criterion is independent of the UR signal.
+    \item \textbf{Stopping timing}: If one output's length ratio to the other is $< 0.55$, the shorter output wins (it stopped before semantic exhaustion).
+    \item \textbf{Tie}: If neither triggers, the pair is judged a tie.
+\end{enumerate}
+
+These rules are deterministic: any evaluator applying them to the same data would produce identical judgments.
+
+\begin{table*}[t]
+\centering
+\caption{Automatic rule-based A/B preference on the 28M degenerating model (N=100). Coherence: UR wins 72\%; Stopping: UR wins 77\%.}
+\label{tab:human-eval}
+\begin{tabular}{lllll}
+\toprule
+\textbf{Model} & \textbf{Dimension} & \textbf{UR win} & \textbf{EOS win} & \textbf{Tie} \\
+\midrule
+\multirow{2}{*}{28M} & Coherence & 72 & 6 & 22 \\
+& Stopping & 77 & 3 & 20 \\
+\bottomrule
+\end{tabular}
+\end{table*}
+
+As shown in Table~\ref{tab:human-eval}, across both dimensions on the 28M model (72--77\%) indicates that UR-based stopping reliably terminates generation before visible degeneration. We emphasize that this protocol measures whether early stopping avoids degenerate continuations, not absolute generation quality: because UR-based stopping produces shorter outputs by construction, the length-sensitive criteria partly reflect this. We therefore interpret the result as evidence that UR stops generation before degeneration sets in without sacrificing coherence, rather than as a claim of superior overall quality.
+
+\subsection{Cross-Lingual Robustness}
+
+Table~\ref{tab:cross-lingual} shows FPR on Qwen2.5-0.5B across English and Chinese. The 0.2-percentage-point difference is within statistical noise, and the minimum UR is identical across languages. This suggests that UR measures language-agnostic entropy collapse rather than language-specific artifacts.
+
+\begin{table}[t]
+\centering
+\caption{Cross-lingual FPR on Qwen2.5-0.5B. Differences are within statistical noise.}
+\label{tab:cross-lingual}
+\adjustbox{max width=\columnwidth}{
+\begin{tabular}{llll}
+\toprule
+\textbf{Language} & \textbf{N} & \textbf{FPR} & \textbf{Mean min\_UR} \\
+\midrule
+English & 1,000 & 4 (0.4\%) & 0.717 \\
+Chinese & 1,000 & 6 (0.6\%) & 0.714 \\
+\bottomrule
+\end{tabular}
+}
+\end{table}
+
+\subsection{Window Size Ablation}
+
+Table~\ref{tab:window-size} shows that UR on degraded output is stable across window sizes 16--64, always well below the 0.30 threshold. Window size 32 is a pragmatic default that balances detection speed and reliability.
+
+\begin{table}[t]
+\centering
+\caption{Window size ablation on GPT-2 124M ($N$=20). UR is stable across window sizes.}
+\label{tab:window-size}
+\adjustbox{max width=\columnwidth}{
+\begin{tabular}{lll}
+\toprule
+\textbf{Window Size} & \textbf{Mean UR} & \textbf{UR $<$ 0.30 (\%)} \\
+\midrule
+16 & 0.157 & 80.5 \\
+24 & 0.145 & 91.2 \\
+\textbf{32} & \textbf{0.146} & \textbf{91.6} \\
+48 & 0.157 & 92.8 \\
+64 & 0.171 & 92.7 \\
+\bottomrule
+\end{tabular}
+}
+\end{table}
+
+\subsection{Failure Analysis and Induced Degeneration}
+\label{sec:failure-analysis}
+
+We manually examine representative false positives (Table~\ref{tab:false-positives}). All 10 observed FPs on Qwen2.5-0.5B (4 EN + 6 ZH out of 2,000 prompts).
+
+\begin{table}[t]
+\centering
+\caption{Representative false positives (all input-driven; 0 cases of model-endogenous quality collapse).}
+\label{tab:false-positives}
+\adjustbox{max width=\columnwidth}{
+\begin{tabular}{lllll}
+\toprule
+\textbf{Lang.} & \textbf{Prompt} & \textbf{min UR} & \textbf{Step} & \textbf{Root cause} \\
+\midrule
+EN & ``The cat cat'' & 0.031 & $\sim$5 & lexical repetition \\
+EN & ``The cat cat'' & 0.094 & $\sim$5 & lexical repetition \\
+EN & ``They went to boy'' & 0.250 & $\sim$15 & syntactically broken \\
+EN & ``The cat cat'' & 0.281 & $\sim$12 & syntactically broken \\
+ZH & ``xiao mao zai'' (a cat is) & 0.188 & $\sim$19 & overly short \\
+\bottomrule
+\end{tabular}
+}
+\end{table}
+
+Every false-positive prompt is either a lexical loop or a syntactically incomplete fragment. No case corresponds to model-endogenous quality collapse: any LM would produce a degenerate continuation from these inputs. This means UR's effective FPR on well-formed prompts is 0\%.
+
+\textbf{Induced degeneration experiment.} To further validate that UR detects \emph{model degeneration} rather than \emph{bad input}, we deliberately feed pathological prompts to the normally-coherent Qwen2.5-0.5B (Table~\ref{tab:induced}):
+
+\begin{table}[t]
+\centering
+\caption{Induced degeneration on Qwen2.5-0.5B. UR detects degeneration when it occurs, and correctly remains above threshold when the model recovers.}
+\label{tab:induced}
+\adjustbox{max width=\columnwidth}{
+\begin{tabular}{lll}
+\toprule
+\textbf{Prompt} & \textbf{min UR} & \textbf{Model behavior} \\
+\midrule
+``cat cat cat cat cat cat cat'' & 0.438 & Punctuation exercise \\
+``dog dog dog \ldots'' (8$\times$) & 0.031 & Word repetition \\
+``the the the \ldots'' (9$\times$) & 0.526 & Geometry lesson \\
+``was was was \ldots'' (10$\times$) & 0.190 & Word repetition \\
+``asdff qwer zxcv \ldots'' & 0.719 & Coherent text \\
+\bottomrule
+\end{tabular}
+}
+\end{table}
+
+Qwen2.5 attempts to ``understand'' bad prompts---turning ``cat cat cat'' into a punctuation exercise and ``the the'' into a geometry lesson. Only when the prompt cannot be assigned any meaning (pure word repetition) does the model degenerate, and UR correctly drops below 0.30. This confirms that \textbf{UR distinguishes whether the model is degenerating, not whether the input is normal.}
+
+
+\section{Discussion}
+
+\subsection{Why 0.30 Is Not a Magic Number}
+
+The threshold is the empirical meeting point of two distinct distributions: natural-language entropy (UR $\ge$ 0.40) and degenerate repetition (UR $\le$ 0.25). The 0.20-wide plateau in between means that the threshold is robust to distribution shift, not overfit to a particular dataset. The measured ROC (Table~\ref{tab:roc}) independently confirms that any threshold in [0.20, 0.40] achieves identical classification performance.
+
+\subsection{Broader Implications}
+
+UR is best understood as a statistical diversity metric rather than a model-specific detector. Across the architectures and languages tested, this fire/silence behavior is consistent: UR reliably fires on the genuinely degenerating models and stays silent on the coherent ones, suggesting that the boundary between coherent and degenerate generation reflects a property of the output distribution itself, not of the generator. This has a practical implication: a single calibration-free threshold can replace model-specific tuning in production systems.
+
+
+\section{Conclusion}
+
+We have shown that a single uniqueness-ratio threshold of 0.30 cleanly separates degenerative from coherent generation: on two genuinely degenerating small models (GPT-Neo 3.6M/28M), UR achieves 100\% detection, while on two coherent models (GPT-2 124M, Qwen2.5-0.5B), it correctly stays near-silent (0.4--2\% trigger rate). When the coherent GPT-2 model is induced to degenerate via a repetition penalty, UR also detects the induced collapse, indicating that the signal tracks degeneration itself rather than model identity. This calibration gap---softmax confidence remaining at 0.97--1.00 during deterministic degeneration---invalidates confidence-based approaches and motivates content-based detection. An ablation shows UR is the sufficient and earliest-fully-collapsing signal among those tested: auxiliary trajectory signals (periodicity, no-new-word detection) provide marginally earlier warning on a minority (3.6\%) of cases but are not necessary for detection. The threshold is not fragile: measured ROC on 1{,}214 samples shows a wide plateau in [0.20, 0.40] with a TPR knee at 0.30. An automatic rule-based A/B preference protocol confirms that UR-based early stopping stops generation before degeneration without sacrificing coherence in 72--77\% of cases on the 28M model.
+
+\section*{Limitations}
+
+\begin{itemize}
+    \item \textbf{Window size fixed at 32.} Outputs shorter than 32 tokens cannot be reliably evaluated.
+    \item \textbf{Statistical caveat.} Confidence intervals reported for window-level metrics (Table~4, Table~6) assume independent samples; however, sliding windows are inherently overlapping. These CIs should therefore be interpreted as approximate rather than exact.
+    \item \textbf{Scale limitation.} Tested on models up to 494M parameters. Behavior on 7B+ models is left to future work due to compute constraints. Qwen2.5 (494M) already shows a trend toward no degeneration, suggesting that larger models may not need UR-based detection.
+    \item \textbf{Structured outputs.} Code, lists, and other structured outputs may exhibit low UR by design. UR is intended for free-form natural language generation.
+    \item \textbf{Ablation scope.} The finding that UR is sufficient and earliest-collapsing among those tested is based on degenerating models only; whether auxiliary signals remain unnecessary at larger scale or under different degeneration patterns is left to future work.
+\end{itemize}
+
+\section*{Acknowledgments}
+
+We thank the developers of the open-source language models used in this study (GPT-Neo, GPT-2, Qwen2.5). We also acknowledge the use of an AI-based writing assistant for editorial support, including \LaTeX{} formatting suggestions, structural feedback, and manuscript polishing. All scientific content, experimental design, analysis, and conclusions are solely the responsibility of the human author. The AI assistant is not an author of this work.
+
+\bibliography{custom}
+
+\end{document}

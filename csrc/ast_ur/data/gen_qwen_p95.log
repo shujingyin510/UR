@@ -1,0 +1,27 @@
+Loading weights:   0%|          | 0/290 [00:00<?, ?it/s]Loading weights:  84%|████████▍ | 245/290 [00:00<00:00, 2447.84it/s]Loading weights: 100%|██████████| 290/290 [00:00<00:00, 2509.52it/s]
+[qwen/p95] 加载 1.0s  {'temperature': 1.0, 'top_p': 0.95}
+[qwen/p95] merge_sort      263 tok    31.8s    8.3 tok/s  eos=True
+[qwen/p95] binary_search   106 tok    12.7s    8.4 tok/s  eos=True
+[qwen/p95] fibonacci       202 tok    24.2s    8.3 tok/s  eos=True
+[qwen/p95] parse_csv       552 tok    66.5s    8.3 tok/s  eos=True
+[qwen/p95] word_freq        68 tok     8.1s    8.3 tok/s  eos=True
+[qwen/p95] flatten          88 tok    10.5s    8.3 tok/s  eos=True
+[qwen/p95] stack_class     195 tok    23.4s    8.3 tok/s  eos=True
+[qwen/p95] lru_cache       600 tok    72.1s    8.3 tok/s  eos=False
+[qwen/p95] prime_sieve     296 tok    35.4s    8.4 tok/s  eos=True
+[qwen/p95] roman           271 tok    32.4s    8.4 tok/s  eos=True
+[qwen/p95] balanced         75 tok     9.0s    8.4 tok/s  eos=True
+[qwen/p95] transpose       143 tok    17.1s    8.4 tok/s  eos=True
+[qwen/p95] rle             116 tok    13.9s    8.3 tok/s  eos=True
+[qwen/p95] dedup           323 tok    38.9s    8.3 tok/s  eos=True
+[qwen/p95] gcd             224 tok    26.9s    8.3 tok/s  eos=True
+[qwen/p95] quicksort       600 tok    72.3s    8.3 tok/s  eos=False
+[qwen/p95] tree_walk       344 tok    42.0s    8.2 tok/s  eos=True
+[qwen/p95] json_walk        54 tok     6.4s    8.4 tok/s  eos=True
+[qwen/p95] email           193 tok    23.1s    8.4 tok/s  eos=True
+[qwen/p95] temp            192 tok    23.0s    8.4 tok/s  eos=True
+[qwen/p95] reverse_words    74 tok     8.9s    8.3 tok/s  eos=True
+[qwen/p95] anagram           9 tok     1.1s    8.2 tok/s  eos=True
+[qwen/p95] pascal           68 tok     8.1s    8.4 tok/s  eos=True
+[qwen/p95] chunk            37 tok     4.4s    8.3 tok/s  eos=True
+[qwen/p95] 完成 → D:\Test\UR\csrc\ast_ur\data\gen_qwen_p95.jsonl

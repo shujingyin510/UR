@@ -1,0 +1,27 @@
+Loading weights:   0%|          | 0/292 [00:00<?, ?it/s]Loading weights: 100%|██████████| 292/292 [00:00<00:00, 5926.57it/s]
+[gpt2m] 加载 0.7s
+[gpt2m] merge_sort      600 tok    60.5s    9.9 tok/s  eos=False
+[gpt2m] binary_search   600 tok    59.0s   10.2 tok/s  eos=False
+[gpt2m] fibonacci       600 tok    59.0s   10.2 tok/s  eos=False
+[gpt2m] parse_csv       600 tok    49.9s   12.0 tok/s  eos=False
+[gpt2m] word_freq       600 tok    49.7s   12.1 tok/s  eos=False
+[gpt2m] flatten         600 tok    51.3s   11.7 tok/s  eos=False
+[gpt2m] stack_class     600 tok    53.4s   11.2 tok/s  eos=False
+[gpt2m] lru_cache       600 tok    49.7s   12.1 tok/s  eos=False
+[gpt2m] prime_sieve     600 tok    49.6s   12.1 tok/s  eos=False
+[gpt2m] roman           600 tok    49.4s   12.1 tok/s  eos=False
+[gpt2m] balanced        600 tok    49.2s   12.2 tok/s  eos=False
+[gpt2m] transpose       600 tok    49.4s   12.1 tok/s  eos=False
+[gpt2m] rle             600 tok    49.4s   12.1 tok/s  eos=False
+[gpt2m] dedup           600 tok    49.5s   12.1 tok/s  eos=False
+[gpt2m] gcd             600 tok    49.5s   12.1 tok/s  eos=False
+[gpt2m] quicksort       600 tok    49.4s   12.1 tok/s  eos=False
+[gpt2m] tree_walk       600 tok    49.4s   12.1 tok/s  eos=False
+[gpt2m] json_walk       600 tok    49.3s   12.2 tok/s  eos=False
+[gpt2m] email           600 tok    49.2s   12.2 tok/s  eos=False
+[gpt2m] temp            600 tok    49.4s   12.1 tok/s  eos=False
+[gpt2m] reverse_words   600 tok    49.7s   12.1 tok/s  eos=False
+[gpt2m] anagram         600 tok    49.9s   12.0 tok/s  eos=False
+[gpt2m] pascal          600 tok    49.3s   12.2 tok/s  eos=False
+[gpt2m] chunk           600 tok    49.3s   12.2 tok/s  eos=False
+[gpt2m] 完成 → D:\Test\UR\csrc\ast_ur\data\gen_gpt2m.jsonl
