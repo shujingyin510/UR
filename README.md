@@ -1,17 +1,47 @@
-# UR — A Surprisingly Stable Degeneration Threshold for Small LLMs
+# UR — Degeneration as Emergent Period: Spectrum, Floor Law, and Multi-Scale Detection
 
 ![Models](https://img.shields.io/badge/models-GPT--2%20%7C%20Qwen2.5%20%7C%20TinyStories-blue)
-![UR](https://img.shields.io/badge/threshold-UR%E2%89%880.30-orange)
+![Theory](https://img.shields.io/badge/theory-R1--R4%20Period%20Spectrum-green)
+![UR](https://img.shields.io/badge/short-wave-UR%E2%89%880.30-orange)
 
-> **UR ≈ 0.30 reliably separates degenerative from coherent text generation across 4 small models, 3 architectures, and 3 orders of magnitude in parameter count.**
+> **Code-generation collapse is an attractor with (unit, wavelength L, alphabet D). A fixed-window uniqueness-ratio detector is a band-pass filter — UR≈0.30 covers the short-wave band only. Full coverage needs three parallel axes.**
 
-[Quick Start](QUICK_START.md) | [Results](RESULTS.md) | [Research](docs/research/ternary_gating_report_EN.md) | [Roadmap](ROADMAP.md)
+[Quick Start](QUICK_START.md) | [Results](RESULTS.md) | [Theory Update](#theory-update-r1--r4) | [Research](docs/research/ternary_gating_report_EN.md) | [Roadmap](ROADMAP.md)
 
 ---
 
-## Main Finding
+## Theory Update (R1–R4)
 
-A single **uniqueness-ratio threshold of 0.30** — the fraction of unique tokens in a sliding 32-token window — detects when a language model has collapsed into repetitive degeneration:
+Four local experiments (192 sequences: 4 decoders × 24 prompts × greedy / T=0.8 / top-p=0.95, zero API) unified into a **period-spectrum framework**:
+
+```text
+Emergent period (unit × L × D)
+        → model fingerprint P(L)
+        → representation axis × decoding measure
+        → detector = band-pass filter;  UR_floor ≈ D/W
+        → blind ⇔ (L > W) ∨ (D ≥ θW)
+        → three-axis parallel gate
+        → decision: trailing period ∧ non-natural EOS
+```
+
+| Claim | Evidence |
+|-------|----------|
+| **H1 Universality** | 4/4 decoders show trailing periods under greedy (GPT-2 family 92–100%, Qwen 33%) |
+| **H2 Sampling = frequency shift** | Sampling does not create new attractors (from nowhere 1/32); it shifts wavelength 23→41 and verbatim share 100%→20%. Weak models: degeneration survives at 19/24 — shift ≠ eliminate |
+| **H3 Two-factor blindness** | Window-vs-period alone ≈40% (coin flip); with D, `(L>W)∨(D≥θW)` reaches 89–97% |
+| **Floor law** | `UR_floor ≈ unique-period-elements / W` — greedy identity r=0.998; sampling first-order r=0.742 |
+| **Spectrum = fingerprint** | GPT-2 single-peak short-wave (L median 23); Qwen long tail; scale shifts spectrum right (23→31→32) but not degeneration rate — rate tracks training recipe |
+| **Decision rule** | Trailing period ∧ non-natural EOS: 32/32 zero false positives on greedy battery |
+
+**Where the classic UR≈0.30 threshold sits**: it is the **sub-line short-wave band-pass** (window=32). It is necessary but not sufficient — R1 showed it is blind on ~85% of long-period code degeneration cases (whole-function loops, renamed-block repeats).
+
+Full derivation, ASCII fingerprints, and falsification conditions live in the project knowledge base notes (`UR-退化理论总览` and R1–R4 experiment notes).
+
+---
+
+## Main Finding (short-wave band: UR≈0.30)
+
+A single **uniqueness-ratio threshold of 0.30** — the fraction of unique tokens in a sliding 32-token window — detects short-wave repetitive degeneration:
 
 | Model | Architecture | Params | Behavior | UR=0.30 Result |
 |-------|-------------|--------|----------|----------------|
@@ -133,13 +163,18 @@ The current evaluation includes:
 
 Results are consistent across these models, but this should be interpreted as *empirical cross-model stability within tested regimes*, not full model-invariance across all architectures.
 
-### 5. Scale limitation
+### 5. Scale and horizon limitation
 
 No evaluation has been performed on:
 - 7B+ parameter models (e.g., LLaMA-3, Qwen2.5-7B)
 - Instruction-tuned large chat models in open-ended dialogue regimes
+- Horizons beyond ~600 tokens (R1–R4 battery)
 
-Generalization to large-scale models remains an open question.
+Generalization beyond the tested decoders and horizon remains open.
+
+### 6. Fixed-window blind band (theory)
+
+With window W=32, degeneration whose period L>W or alphabet D≥θW is **structurally invisible** to token-UR (R1/R2/R4). Use multi-scale evidence (token-UR ∨ skeleton period ∨ line period) for full coverage; see Theory Update above.
 
 ---
 
@@ -216,17 +251,24 @@ UR/
 
 | Component | Status |
 |-----------|--------|
-| UR=0.30 validation (4 models, 3 architectures) | ✅ |
+| UR=0.30 short-wave validation (4 models, 3 architectures) | ✅ |
 | 1000-prompt benchmark per model | ✅ |
 | Human blind evaluation (100 prompts) | ✅ |
 | Ablation: UR-only vs full trajectory | ✅ |
 | Statistical significance (p < 0.05) | ✅ |
+| **R1 AST skeleton repeat rate** | ✅ |
+| **R2 Floor law (UR≈D/W)** | ✅ |
+| **R3 Sampling frequency-shift** | ✅ |
+| **R4 Period spectrum + multi-scale decision** | ✅ |
 | AVX2 GEMM kernel (66 GFLOPS) | ✅ |
 | C LayerNorm/GELU/Softmax kernels | ✅ |
 | KV Cache inference (logit_diff=0.000046) | ✅ |
+| Streaming three-axis gate prototype | ⬜ |
+| Temperature scan × multi-seed shift curves | ⬜ |
+| ROC threshold expansion (multi-axis) | ⬜ |
+| Instruction models / longer horizon | ⬜ |
 | GGUF / quantization | ⬜ |
-| Larger models (TinyLlama, SmolLM) | ⬜ |
-| Paper submission | ⬜ |
+| Paper submission (period-spectrum mainline) | ⬜ |
 
 ---
 
