@@ -151,7 +151,7 @@ We therefore propose a \textbf{mechanism-agnostic, content-based degeneration de
 
 \paragraph{Diversity and repetition metrics.} Lexical-diversity measures such as distinct-$n$ \citep{li2016} and sequence-level repetition rates (seq-rep-$n$; \citealp{welleck2020}) are standard for evaluating generated text. UR can be viewed as a windowed distinct-1 computed online during decoding. Our contribution is not the statistic itself but (i) the empirical calibration gap that motivates a content-based signal, and (ii) a single, architecture- and language-stable decision threshold with measured-ROC support, turning a corpus-level diversity metric into an online stopping rule.
 
-\textbf{Positioning.} Unlike prior work, our method is (i)~\emph{content-driven} (depends on output statistics, not model internals), (ii)~\emph{mechanism-agnostic} (works alongside any sampling strategy), and (iii)~\emph{language-agnostic} (verified on English and Chinese). Our UR-based degeneration detector aligns with the goals of shared tasks such as SHROOM-Visions, offering a lightweight, model-agnostic signal for hallucination detection that complements existing reference-based metrics.
+\textbf{Positioning.} Unlike prior work, our method is (i)~\emph{content-driven} (depends on output statistics, not model internals), (ii)~\emph{mechanism-agnostic} (works alongside any sampling strategy), and (iii)~\emph{language-agnostic} (verified on English and Chinese). Relative to windowed distinct-$n$, we contribute a calibration gap, a short-wave threshold with ROC support, \emph{and} a period-spectrum account that explains when windowed metrics fail and how to cover the missing bands. Our UR-based degeneration detector aligns with the goals of shared tasks such as SHROOM-Visions, offering a lightweight, model-agnostic signal for hallucination detection that complements existing reference-based metrics.
 
 \section{Method}
 
@@ -234,6 +234,41 @@ We choose threshold $\tau = 0.30$ and stop generation when $\text{UR}(t; 32) < \
     \item Degenerate text has $\text{UR} \in [0.01, 0.25]$ (model baseline mean = 0.102).
     \item The threshold lies in a wide separation band $[0.20, 0.40]$ where classification is invariant to the exact choice.
 \end{itemize}
+This rule is calibrated on \emph{short-wave} lexical loops. Section~\ref{sec:period-spectrum} shows it is a band-pass special case of a more general detector.
+
+\subsection{Emergent Period}
+\label{sec:method-period}
+
+We model degeneration as capture by a \textbf{repetition attractor}
+\[
+\mathcal{A} = (\text{unit},\, L,\, D),
+\]
+where \emph{unit} is a structural quantum (statement, block, function, function pair, or prose sentence), $L$ is the \emph{wavelength} (tokens per cycle), and $D$ is the number of distinct tokens inside one cycle. On an observation axis (token stream, statement-skeleton hashes, or normalized lines), a degenerating suffix becomes approximately periodic: for some period $p$ and start $s$, $z_{i} \approx z_{i-p}$ for $i \ge s$ up to a small residual slack from truncation.
+
+Sampling does not create a new attractor from nothing; it changes the \emph{measure} with which the decoder reaches $\mathcal{A}$ (frequency shift and mutation of copies). This yields the two-factor blindness rule for a fixed window $W$ and threshold $\theta$:
+\[
+\text{blind} \iff (L > W) \;\lor\; (D \ge \theta W).
+\]
+
+\subsection{Floor Law}
+\label{sec:method-floor}
+
+When a window fully covers an integer number of cycles, the unique-element count cannot fall below the number of distinct elements in one period. Hence
+\[
+\mathrm{UR}_{\mathrm{floor}} \approx \frac{D}{W}.
+\]
+On greedy code batteries this holds as an identity on the token axis (Pearson $r=0.998$; mean absolute error $0.003$). Token-UR$<\tau$ therefore fires iff $D < \tau W$ \emph{and} the window is not blind to $L$. Measuring the period itself is wavelength-agnostic.
+
+\subsection{Three-Axis Parallel Gate}
+\label{sec:method-gate}
+
+Because no single fixed window covers all $L$, we detect on three axes and take a logical OR:
+\begin{itemize}
+    \item \textbf{Token-UR} (window $W{=}32$, $\tau{=}0.30$): sub-line short-wave loops;
+    \item \textbf{Statement-skeleton period}: identifier-normalized statement hashes; catches renamed / mutated whole-function repeats;
+    \item \textbf{Line period}: stripped-line hashes; parser-free long-wave verbatim loops.
+\end{itemize}
+\textbf{Decision:} fire iff (any axis has a trailing period $\land$ the stop is not a natural EOS) $\lor$ (token-UR $<\tau$). Natural EOS suppresses period alarms so that symmetric but finite code (e.g., unit conversions) is not flagged. A streaming reference implementation is released under \texttt{csrc/stream\_gate/}.
 
 \section{Experiments}
 
@@ -502,30 +537,115 @@ Every false-positive prompt is either a lexical loop or a syntactically incomple
 
 Qwen2.5 attempts to ``understand'' bad prompts---turning ``cat cat cat'' into a punctuation exercise and ``the the'' into a geometry lesson. Only when the prompt cannot be assigned any meaning (pure word repetition) does the model degenerate, and UR correctly drops below 0.30. This confirms that \textbf{UR distinguishes whether the model is degenerating, not whether the input is normal.}
 
+\section{Period Spectrum Experiments}
+\label{sec:period-spectrum}
+
+The short-wave battery above establishes UR$\approx$0.30 on narrative continuations. We next report four offline experiments (R1--R4; all local, no API) on \emph{code} generation, where long-period structural collapse dominates. Corpus: 24 Python function/class prompts $\times$ up to four decoders (GPT-2 124M/355M/774M and Qwen2.5-0.5B) $\times$ greedy / $T{=}0.8$ / nucleus $p{=}0.95$, 600-token horizon (192 sequences in the full grid).
+
+\subsection{Structural Blindness of Token-UR (R1)}
+\label{sec:r1}
+
+We hash each statement's AST skeleton (identifiers and constants normalized; operators preserved) and compute a sliding unique-ratio on the statement axis. Among 26 structural collapses, token-UR ($\tau{=}0.30$, $W{=}32$) fails to fire on \textbf{22 (85\%)}. The only case where both fire and AST is late still lags by only 4--30 tokens; the reverse pattern (\emph{only} token-UR fires) is \textbf{0/48}. In the strongest example (Qwen, quicksort), skeleton-UR alarms at token 248 while token-UR barely triggers at 578---a \textbf{330-token} lead, about two full functions of budget. Mechanism: GPT-2 loops a multi-statement block whose token period $\approx W$ (window stays lexically diverse); Qwen regenerates whole functions with fresh names (tokens always new, skeleton identical).
+
+\subsection{Units, Wavelength, and Floor Law (R2)}
+\label{sec:r2}
+
+On the same 48 sequences we extract minimal trailing periods on the statement and line axes.
+
+\begin{table}[t]
+\centering
+\caption{Repetition units and wavelengths (greedy). GPT-2 is a short-wave verbatim reprinter; Qwen a long-wave mutator.}
+\label{tab:r2-units}
+\adjustbox{max width=\columnwidth}{
+\begin{tabular}{lllll}
+\toprule
+\textbf{Model} & \textbf{Unit mix} & \textbf{Verbatim} & \textbf{$L$ median (range)} & \textbf{$D$ median} \\
+\midrule
+GPT-2 124M & stmt 14 / fn 6 / blk 2 & 22/22 & 23 (7--53) & 19 \\
+Qwen 0.5B & fn 4 / pair 2 / blk 3 & 3/9 & 57 (21--205) & 33 \\
+\bottomrule
+\end{tabular}
+}
+\end{table}
+
+For sequences with $L\le 32$, predicted floor $D/32$ vs.\ measured tail token-UR gives $r=0.998$ (21/23 exact). The trailing-period $\land$ non-EOS rule hits \textbf{32/32} true degenerations with \textbf{0} false alarms; the single benign period (a Celsius/Fahrenheit converter) is excluded precisely because it ends with natural EOS. Fixed-window AST-UR with $w{=}8$ has its own blind band when $p > w$.
+
+\subsection{Sampling Shifts Frequency, Not Existence (R3)}
+\label{sec:r3}
+
+\begin{table}[t]
+\centering
+\caption{Degeneration under sampling ($n{=}24$ per cell). Weak models shift wavelength; strong models clear within horizon.}
+\label{tab:r3-shift}
+\adjustbox{max width=\columnwidth}{
+\begin{tabular}{lllll}
+\toprule
+\textbf{Condition} & \textbf{Degen.} & \textbf{Verbatim} & \textbf{$L$ median} & \textbf{$L>32$} \\
+\midrule
+GPT-2 greedy & 24/24 & 24/24 & 23 & 8\% \\
+GPT-2 $T{=}0.8$ & 19/24 & 12/19 & \textbf{41} & \textbf{74\%} \\
+GPT-2 $p{=}0.95$ & 10/24 & 2/10 & 29 & 40\% \\
+Qwen greedy & 8/24 & 4/8 & 57 & --- \\
+Qwen $T{=}0.8$ & 2/24 & 0/2 & 16 & --- \\
+Qwen $p{=}0.95$ & \textbf{0/24} & --- & --- & --- \\
+\bottomrule
+\end{tabular}
+}
+\end{table}
+
+Temperature on GPT-2 barely reduces the degeneration rate (100\%$\to$79\%) but stretches median wavelength by $\times 1.8$ and collapses the verbatim share; the fraction of degenerations that \emph{hide} beyond a 32-token window jumps from 8\% to 74\%. Sampling therefore makes weak-model collapse \emph{harder} for fixed-window detectors. Qwen clears within the 600-token horizon. ``From-nowhere'' period creation is rare (1/32 prompt-conditions).
+
+\subsection{Period Spectra and Multi-Scale Coverage (R4)}
+\label{sec:r4}
+
+\begin{table}[t]
+\centering
+\caption{Greedy spectra and two-factor rule. Rule~1 uses only $L$ vs.\ $W$; Rule~2 adds $D$ (floor law).}
+\label{tab:r4-spectrum}
+\adjustbox{max width=\columnwidth}{
+\begin{tabular}{llllll}
+\toprule
+\textbf{Decoder} & \textbf{Degen.} & \textbf{EOS} & \textbf{$L$ med.} & \textbf{Rule~1 tok} & \textbf{Rule~2 tok} \\
+\midrule
+GPT-2 124M & 24/24 & 0 & 23 & \multirow{4}{*}{41/102 (40\%)} & \multirow{4}{*}{91/102 (89\%)} \\
+GPT-2 355M & 23/24 & 0 & 31 & & \\
+GPT-2 774M & 22/24 & 0 & 32 & & \\
+Qwen 0.5B & 8/24 & 16 & 67 & & \\
+\bottomrule
+\end{tabular}
+}
+\end{table}
+
+All four decoders exhibit trailing periods under greedy decoding. Within the GPT-2 family, scale shifts the spectrum right ($23\to31\to32$) without eliminating collapse; crossing to code-trained Qwen drops the rate. Spectra are therefore fingerprints: \emph{wavelength tracks scale; degeneration rate tracks training recipe}. Blindness predicted by $(L>W)\lor(D\ge\theta W)$ reaches 89--97\% versus 40\% for $L$ vs.\ $W$ alone. Token-UR, skeleton period, and line period cover complementary bands (sub-line short wave / mid-wave mutation / long-wave verbatim).
 
 \section{Discussion}
 
 \subsection{Why 0.30 Is Not a Magic Number}
 
-The threshold is the empirical meeting point of two distinct distributions: natural-language entropy (UR $\ge$ 0.40) and degenerate repetition (UR $\le$ 0.25). The 0.20-wide plateau in between means that the threshold is robust to distribution shift, not overfit to a particular dataset. The measured ROC (Table~\ref{tab:roc}) independently confirms that any threshold in [0.20, 0.40] achieves identical classification performance.
+The threshold is the empirical meeting point of two distinct distributions: natural-language entropy (UR $\ge$ 0.40) and degenerate repetition (UR $\le$ 0.25). The 0.20-wide plateau in between means that the threshold is robust to distribution shift, not overfit to a particular dataset. The measured ROC (Table~\ref{tab:roc}) independently confirms that any threshold in [0.20, 0.40] achieves identical classification performance. Equivalently, in floor-law language, $\tau{=}0.30$ is the knee where $D < \tau W$ separates short-wave loops from diverse text on the token axis.
+
+\subsection{From Threshold to Spectrum}
+
+Token-UR is a \emph{band-pass} filter on wavelength, not a universal detector. R1--R4 show that (i)~most code collapses are long-period and invisible to $W{=}32$; (ii)~the floor law $\mathrm{UR}\approx D/W$ predicts when a window can fire; (iii)~sampling shifts $L$ into the blind band; and (iv)~period spectra separate models. Practical systems should run the three-axis gate of Section~\ref{sec:method-gate} rather than a single threshold alone.
 
 \subsection{Broader Implications}
 
-UR is best understood as a statistical diversity metric rather than a model-specific detector. Across the architectures and languages tested, this fire/silence behavior is consistent: UR reliably fires on the genuinely degenerating models and stays silent on the coherent ones, suggesting that the boundary between coherent and degenerate generation reflects a property of the output distribution itself, not of the generator. This has a practical implication: a single calibration-free threshold can replace model-specific tuning in production systems.
+UR is best understood as a statistical diversity metric rather than a model-specific detector. Across the architectures and languages tested, this fire/silence behavior is consistent: UR reliably fires on the genuinely degenerating models and stays silent on the coherent ones, suggesting that the boundary between coherent and degenerate generation reflects a property of the output distribution itself, not of the generator. This has a practical implication: a single calibration-free threshold can replace model-specific tuning in production systems for short-wave loops; multi-scale period detectors extend that guarantee to structural code collapse.
 
 
 \section{Conclusion}
 
-We have shown that a single uniqueness-ratio threshold of 0.30 cleanly separates degenerative from coherent generation: on two genuinely degenerating small models (GPT-Neo 3.6M/28M), UR achieves 100\% detection, while on two coherent models (GPT-2 124M, Qwen2.5-0.5B), it correctly stays near-silent (0.4--2\% trigger rate). When the coherent GPT-2 model is induced to degenerate via a repetition penalty, UR also detects the induced collapse, indicating that the signal tracks degeneration itself rather than model identity. This calibration gap---softmax confidence remaining at 0.97--1.00 during deterministic degeneration---invalidates confidence-based approaches and motivates content-based detection. An ablation shows UR is the sufficient and earliest-fully-collapsing signal among those tested: auxiliary trajectory signals (periodicity, no-new-word detection) provide marginally earlier warning on a minority (3.6\%) of cases but are not necessary for detection. The threshold is not fragile: measured ROC on 1{,}214 samples shows a wide plateau in [0.20, 0.40] with a TPR knee at 0.30. An automatic rule-based A/B preference protocol confirms that UR-based early stopping stops generation before degeneration without sacrificing coherence in 72--77\% of cases on the 28M model.
+We document an extrinsic-lexical calibration gap: softmax confidence remains at 0.97--1.00 during deterministic loops, invalidating confidence-based stopping. On narrative short-wave loops, a uniqueness-ratio threshold of 0.30 cleanly separates degenerative from coherent generation across four models and three architectures (100\% on GPT-Neo 3.6M/28M; 0.4--2\% on coherent GPT-2/Qwen), with a measured-ROC plateau in [0.20, 0.40]. On code generation, fixed-window UR is structurally blind: 85\% of skeleton collapses never fire token-UR. Recasting degeneration as an emergent period $(unit, L, D)$ yields a floor law $\mathrm{UR}\approx D/W$ ($r=0.998$), a two-factor blindness rule $(L>W)\lor(D\ge\theta W)$ (89--97\%), sampling frequency-shift rather than elimination on weak models, and period spectra as model fingerprints. Detection therefore requires a three-axis parallel gate---token-UR $\lor$ skeleton period $\lor$ line period---decided by trailing-period $\land$ non-EOS (32/32 zero false positives on greedy batteries). We release a streaming reference implementation and all offline traces.
 
 \section*{Limitations}
 
 \begin{itemize}
-    \item \textbf{Window size fixed at 32.} Outputs shorter than 32 tokens cannot be reliably evaluated.
-    \item \textbf{Statistical caveat.} Confidence intervals reported for window-level metrics (Table~4, Table~6) assume independent samples; however, sliding windows are inherently overlapping. These CIs should therefore be interpreted as approximate rather than exact.
-    \item \textbf{Scale limitation.} Tested on models up to 494M parameters. Behavior on 7B+ models is left to future work due to compute constraints. Qwen2.5 (494M) already shows a trend toward no degeneration, suggesting that larger models may not need UR-based detection.
-    \item \textbf{Structured outputs.} Code, lists, and other structured outputs may exhibit low UR by design. UR is intended for free-form natural language generation.
-    \item \textbf{Ablation scope.} The finding that UR is sufficient and earliest-collapsing among those tested is based on degenerating models only; whether auxiliary signals remain unnecessary at larger scale or under different degeneration patterns is left to future work.
+    \item \textbf{Horizon and scale.} Period experiments use a 600-token horizon and decoders $\le$774M (narrative battery $\le$494M). Instruction-tuned chat models and 7B+ scales are untested.
+    \item \textbf{Window size fixed at 32 (token axis).} Outputs shorter than 32 tokens cannot be reliably evaluated by token-UR alone; skeleton/line axes mitigate but do not remove short-sequence limits.
+    \item \textbf{Statistical caveat.} Confidence intervals for overlapping sliding windows are approximate.
+    \item \textbf{Same-corpus floor-law check.} $r=0.998$ is measured on the greedy code battery that motivated the law; independent corpora and sampled decodes should re-calibrate $\theta$ and the EOS heuristic.
+    \item \textbf{Structured vs.\ free-form.} Token-UR targets free-form narrative loops; structural axes target code. Highly regular but finite templates may still need application-specific suppressors.
+    \item \textbf{Streaming skeleton.} The released gate uses a lexical skeleton for latency; full AST skeleton hashing (as in R1) is available offline but not yet in the hot path.
 \end{itemize}
 
 \section*{Acknowledgments}

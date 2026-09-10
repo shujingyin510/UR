@@ -268,7 +268,7 @@ UR/
 | ROC threshold expansion (multi-axis) | ⬜ |
 | Instruction models / longer horizon | ⬜ |
 | GGUF / quantization | ⬜ |
-| Paper submission (period-spectrum mainline) | ⏳ 标题/摘要/Intro 已升维 |
+| Paper submission (period-spectrum mainline) | ⏳ 标题/摘要/Intro/Method/R1–R4/结论已改写 |
 
 ---
 
