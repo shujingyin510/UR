@@ -1,5 +1,7 @@
 # Quick Start — 5 Minutes to First Result
 
+> Mainline narrative is **period-spectrum (R1–R4)**; this guide reproduces the classic **UR≈0.30 short-wave** bench. See README Theory Update for the multi-scale frame.
+
 ## Prerequisites
 
 ```bash

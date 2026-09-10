@@ -1,6 +1,8 @@
 # Ternary Gating for Inference — Complete Experimental Report
 
 > Date: 2026-06-16 ~ 06-18 | Models: TinyStories 3.6M / 28M / GPT-2 124M / Qwen2.5-0.5B
+>
+> **Status (2026-09-10):** Historical report for the **UR≈0.30 short-wave detector**. R1–R4 later showed fixed-window UR is blind on long-period code degeneration; unified theory = **period spectrum** (repo README). Keep as short-wave evidence base, not the sole current claim.
 
 ## Abstract
 

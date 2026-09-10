@@ -1,5 +1,7 @@
 # Results — UR ≈ 0.30 Degeneration Threshold
 
+> **Narrative note (2026-09-10):** This file is the **short-wave band** experiment record (window=32, UR=0.30). The project mainline is now the **period-spectrum theory (R1–R4)** — see README Theory Update. Numbers here remain valid for that band; do not treat them as the sole contribution.
+
 > All experiments run with sliding window=32, UR threshold=0.30, temperature=0.8, top-k=50.
 
 ---
