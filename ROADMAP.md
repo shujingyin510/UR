@@ -32,9 +32,9 @@
 
 | Priority | Item | Notes |
 |----------|------|-------|
-| 🔴 | **Streaming three-axis gate** | token-UR ∨ skeleton period ∨ line period; incremental period estimate (not fixed window) |
-| 🔴 | **Temperature scan × multi-seed** | Map degeneration rate / wavelength / verbatim share vs T (shift law curves) |
-| 🔴 | **Paper mainline: period spectrum** | Reframe ACL draft around emergent period + floor law; UR=0.30 as short-wave case |
+| 🔴 | **Streaming three-axis gate** | ✅ **2026-09-10 参考实现** `csrc/stream_gate/`（token ∨ 骨架周期 ∨ 行周期；收尾周期∧非 EOS；合成序列 8 测全绿，零模型） |
+| 🔴 | **Temperature scan × multi-seed** | Map degeneration rate / wavelength / verbatim share vs T（需本地模型，**暂缓**：机器配置到上限） |
+| 🔴 | **Paper mainline: period spectrum** | ✅ 标题/摘要/Intro/贡献条已升维；正文 Method/Experiments 仍需按 R1–R4 补章节 |
 | 🟡 | **ROC threshold expansion** | Multi-axis D<θW thresholds; merge with R1 sample pool |
 | 🟡 | **Instruction models + longer horizon** | Chat models / >600 token; currently the largest validity gap |
 | 🟡 | **Parser gap: dangling-if** | One known miss (gpt2l/reverse_words) from harness parse hole |

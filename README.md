@@ -263,12 +263,12 @@ UR/
 | AVX2 GEMM kernel (66 GFLOPS) | ✅ |
 | C LayerNorm/GELU/Softmax kernels | ✅ |
 | KV Cache inference (logit_diff=0.000046) | ✅ |
-| Streaming three-axis gate prototype | ⬜ |
-| Temperature scan × multi-seed shift curves | ⬜ |
+| **Streaming three-axis gate prototype** | ✅ 参考实现 `csrc/stream_gate/`（零模型） |
+| Temperature scan × multi-seed shift curves | ⬜ 需本地算力，暂缓 |
 | ROC threshold expansion (multi-axis) | ⬜ |
 | Instruction models / longer horizon | ⬜ |
 | GGUF / quantization | ⬜ |
-| Paper submission (period-spectrum mainline) | ⬜ |
+| Paper submission (period-spectrum mainline) | ⏳ 标题/摘要/Intro 已升维 |
 
 ---
 

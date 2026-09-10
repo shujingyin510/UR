@@ -47,7 +47,7 @@
 %
 % and set <dim> to something 5cm or larger.
 
-\title{Detecting Generation Collapse in Language Models via a Cross-Architecture Unique-Ratio Threshold}
+\title{Degeneration as Emergent Period: Spectrum Laws and Multi-Scale Detection for Small Language Models}
 
 % Author information can be set in various styles:
 % For several authors from the same institution:
@@ -118,7 +118,7 @@
 \maketitle
 
 \begin{abstract}
-Reliable uncertainty estimation is crucial for deploying autoregressive language models safely. However, we identify a fundamental \textbf{extrinsic-lexical uncertainty decoupling} in small language models: during deterministic degenerative loops (e.g., repeating ``was was was''), the model's internal uncertainty signal (softmax confidence) remains artificially saturated at 0.97--1.00, completely decoupling from the actual output quality. This invalidates confidence-based stopping criteria. To address this calibration gap, we propose a mechanism-agnostic \textit{extrinsic uncertainty proxy}: a sliding-window unique-ratio (UR) signal that measures the fraction of distinct tokens in a 32-token window, combined with a single threshold at 0.30. We evaluate UR across four models spanning three architectures (GPT-Neo, GPT-2, Qwen2) and two orders of magnitude in parameters (3.6M--494M). On two genuinely degenerating models (GPT-Neo 3.6M and 28M), UR achieves 100\% detection [95\% CI: 99.6--100\%] under clean sampling. On coherent models (GPT-2 124M and Qwen2.5-0.5B), UR correctly stays near-silent, with trigger/false-positive rates of 0.4--2\%. Critically, when GPT-2---coherent under clean sampling---is induced to degenerate via a repetition penalty, UR detects the induced collapse, demonstrating that the signal tracks actual degeneration rather than model identity. Threshold sensitivity analysis on 1{,}214 measured samples reveals a TPR knee at 0.30 (0.847 $\rightarrow$ 0.993) with a Youden's $J$ optimum at 0.32, confirming the threshold is not fragile. An ablation shows UR is the sufficient and earliest-fully-collapsing signal: auxiliary trajectory signals offer marginally earlier warning on a minority of cases but are not necessary for detection. The threshold is language-agnostic, with cross-lingual (English/Chinese) false-positive differences within statistical noise on Qwen2.5-0.5B. These results suggest a single statistical threshold can serve as a broadly stable degeneration detector that fires on genuine collapse and stays silent on coherent generation, across the architectures, scales, and languages tested.
+Small autoregressive language models often collapse into repetitive generation while softmax confidence remains artificially saturated (0.97--1.00), invalidating confidence-based stopping. We first document this \textbf{extrinsic-lexical uncertainty decoupling} and show that a sliding-window unique-ratio (UR$\approx$0.30) detects \emph{short-wave} loops across four models and three architectures. However, fixed-window UR is structurally blind to long-period code degeneration: in a 48-sequence AST study, token-UR fails on 85\% of structural collapses. We therefore recast degeneration as an \textbf{emergent period} with unit, wavelength $L$, and alphabet $D$. Across 192 measured sequences (four decoders $\times$ 24 prompts $\times$ greedy / temperature / nucleus), we establish: (i)~\emph{universality}---all four decoders exhibit trailing periods under greedy decoding; (ii)~a \emph{floor law} $\mathrm{UR}_{\mathrm{floor}}\approx D/W$ (greedy identity $r=0.998$); (iii)~\emph{sampling shifts frequency rather than eliminating collapse} (median wavelength $23\!\to\!41$, verbatim share $100\%\!\to\!20\%$, while weak models retain $19/24$ degenerations); (iv)~a two-factor blindness rule $(L>W)\lor(D\geq\theta W)$ predicting detector failure at 89--97\%; and (v)~\emph{period spectra as model fingerprints} (scale shifts the spectrum, training recipe shifts the rate). Detection therefore requires a \textbf{three-axis parallel gate}---token-UR $\lor$ statement-skeleton period $\lor$ line period---decided by trailing-period $\land$ non-natural EOS (32/32 zero false positives on greedy batteries). We release a streaming reference implementation, synthetic unit tests, and all offline traces.
 \end{abstract}
 \section{Introduction}
 
@@ -128,7 +128,7 @@ Existing remedies are largely mechanism-specific. Repetition penalties \citep{ke
 
 We demonstrate that this assumption is false. On two small GPT-Neo models (3.6M and 28M parameters), softmax confidence remains at 0.97--1.00 even when the model deterministically outputs ``was was was'' (Section~\ref{sec:calibration-gap}). This decoupling is not a fixable engineering issue but a structural property of the model family at small scales.
 
-We therefore propose a \textbf{mechanism-agnostic, content-based degeneration detector}: a sliding-window unique-ratio (UR) signal, defined as the fraction of distinct tokens in a window of size 32, with a single decision threshold of 0.30. Our contributions are:
+We therefore propose a \textbf{mechanism-agnostic, content-based degeneration detector}: a sliding-window unique-ratio (UR) signal, defined as the fraction of distinct tokens in a window of size 32, with a single decision threshold of 0.30. Subsequent structural experiments (R1--R4) show this signal is a \emph{short-wave band-pass} of a more general phenomenon: degeneration as emergent period, detectable in full only by a three-axis parallel gate (token / statement skeleton / line). Our contributions are:
 
 \begin{itemize}
     \item We empirically identify and document this calibration gap, where softmax confidence is fully decoupled from output quality.
@@ -138,6 +138,7 @@ We therefore propose a \textbf{mechanism-agnostic, content-based degeneration de
     \item We characterize a wide separation band (0.20--0.40) via measured ROC on 1,214 real samples, in which threshold choice is non-fragile.
     \item An automatic, rule-based A/B preference protocol (200 outputs, 2 dimensions) confirms that UR-based early stopping terminates generation before degeneration without sacrificing coherence.
     \item We release code, prompt sets, and UR traces for full reproducibility.\footnote{\url{anonymous.4open.science/r/UR-634E}}
+    \item We extend UR to a \textbf{period-spectrum theory}: floor law $\mathrm{UR}\approx D/W$, sampling frequency-shift, two-factor blindness, and a streaming three-axis gate (token $\lor$ skeleton $\lor$ line) with trailing-period $\land$ non-EOS decision.
 \end{itemize}
 
 \section{Related Work}
